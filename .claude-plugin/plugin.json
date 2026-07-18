@@ -1,0 +1,16 @@
+{
+  "name": "y-qwq-skills",
+  "version": "0.1.0",
+  "description": "A personal collection of reusable agent skills for Claude Code, Codex, and compatible tools.",
+  "author": {
+    "name": "Y-qwq",
+    "url": "https://github.com/Y-qwq"
+  },
+  "homepage": "https://github.com/Y-qwq/skills",
+  "repository": "https://github.com/Y-qwq/skills",
+  "keywords": [
+    "agent-skills",
+    "claude-code",
+    "codex"
+  ]
+}

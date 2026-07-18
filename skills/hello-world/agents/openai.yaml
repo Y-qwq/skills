@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hello World"
+  short_description: "Return a friendly one-line Hello World greeting"
+  default_prompt: "Use $hello-world to greet me."

@@ -1,0 +1,21 @@
+{
+  "name": "y-qwq-skills",
+  "owner": {
+    "name": "Y-qwq"
+  },
+  "metadata": {
+    "description": "Y-qwq's personal collection of reusable agent skills."
+  },
+  "plugins": [
+    {
+      "name": "y-qwq-skills",
+      "description": "A personal collection of reusable agent skills for Claude Code, Codex, and compatible tools.",
+      "source": "./",
+      "author": {
+        "name": "Y-qwq"
+      },
+      "homepage": "https://github.com/Y-qwq/skills",
+      "repository": "https://github.com/Y-qwq/skills"
+    }
+  ]
+}
