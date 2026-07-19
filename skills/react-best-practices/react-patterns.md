@@ -1,6 +1,6 @@
 # React Patterns Reference
 
-本文件提供 `SKILL.md` 中各项 pattern 的代码示例。只有需要查看或编写具体实现时才加载。
+本文件提供 `SKILL.md` 中各项模式的代码示例。只有需要查看或编写具体实现时才加载。
 
 ## Contents
 
@@ -14,11 +14,11 @@
 
 ## Renderer Labels
 
-- **Shared**：与 renderer 无关，适用于 React 的通用 pattern。
+- **Shared**：与 renderer 无关，适用于 React 的通用模式。
 - **React DOM**：使用 browser global、DOM host element 或 `react-dom` API。
-- **React Native**：使用 native host component 或 React Native event API。
+- **React Native**：使用 native host component 或 React Native 事件 API。
 
-为了让示例具体，Shared principle 可能使用某个 renderer 的 host element。应用到其他 renderer 时应迁移 principle，而不是照搬 host API。
+为了让示例足够具体，Shared 原则可能会使用某个 renderer 的 host element。应用到其他 renderer 时，应迁移原则，而不是照搬 host API。
 
 ## [Shared] Effect Anti-Patterns
 
@@ -39,7 +39,7 @@ const [lastName, setLastName] = useState('Swift');
 const fullName = firstName + ' ' + lastName;
 ```
 
-### Expensive Calculation（遵循 Compiler 策略）
+### 昂贵计算（遵循 React Compiler 策略）
 
 ```tsx
 // BAD: Effect for caching
@@ -83,7 +83,7 @@ function Profile({ userId }) {
 }
 ```
 
-### 用户事件处理（使用 Event Handler）
+### 用户事件处理（使用 event handler）
 
 ```tsx
 // BAD: Event-specific logic in Effect
@@ -104,7 +104,7 @@ function ProductPage({ product, addToCart }) {
 }
 ```
 
-### 通知 Parent State 变化
+### 通知 parent state 变化
 
 ```tsx
 // BAD: Effect to notify parent
@@ -132,7 +132,7 @@ function Toggle({ isOn, onChange }) {
 }
 ```
 
-### Effect Chain
+### Effect 链
 
 ```tsx
 // BAD: Effect chain — each effect re-renders before the next fires
@@ -167,9 +167,9 @@ function handlePlaceCard(nextCard) {
 
 ## [Shared] Effect Dependencies
 
-### 修正 Dependency 后再考虑 Suppression
+### 修正依赖后再考虑 suppression
 
-优先重构 Effect，让 dependency list 准确反映真实依赖。Suppression 只能作为例外，并且必须记录无法通过其他方式安全表达的 external identity constraint。
+优先重构 Effect，让 dependency list 准确反映真实依赖。Suppression 只能作为例外，并且必须记录为什么外部 identity 约束无法通过其他方式安全表达。
 
 ```tsx
 // BAD: Suppressing linter hides bugs
@@ -190,7 +190,7 @@ useEffect(() => {
 }, [increment]);
 ```
 
-### [Shared Pattern, React DOM Example] 使用 Updater Function 移除 State Dependency
+### [Shared, React DOM 示例] 使用 updater function 移除 state 依赖
 
 ```tsx
 // BAD: messages in dependencies causes reconnection on every message
@@ -212,7 +212,7 @@ useEffect(() => {
 }, []); // No messages dependency needed
 ```
 
-### 将 Object/Function 移入 Effect
+### 将 object/function 移入 Effect
 
 ```tsx
 // BAD: Object created each render triggers Effect
@@ -236,9 +236,9 @@ function ChatRoom({ roomId, serverUrl }) {
 }
 ```
 
-### 使用 `useEffectEvent` 处理 Non-Reactive Logic
+### 使用 `useEffectEvent` 处理 non-reactive 逻辑
 
-Effect Event 不是通用的 stable callback。它只用于由 Effect 触发的 non-reactive logic；只能从 Effect 或其他 Effect Event 调用，不能传给其他 component 或 Hook，也不应加入 dependency array。
+Effect Event 不是通用的 stable callback。它只用于由 Effect 触发的 non-reactive 逻辑；只能从 Effect 或其他 Effect Event 调用，不能传给其他 component 或 Hook，也不应加入 dependency array。
 
 ```tsx
 // BAD: theme change reconnects chat
@@ -270,7 +270,7 @@ function ChatRoom({ roomId, serverUrl, theme }) {
 }
 ```
 
-### 使用 `useEffectEvent` 包装 Callback Prop
+### 使用 `useEffectEvent` 包装 callback prop
 
 ```tsx
 // BAD: Callback prop in dependencies reconnects if parent re-renders
@@ -298,7 +298,7 @@ function ChatRoom({ roomId, serverUrl, onReceiveMessage }) {
 
 ## Effect Cleanup and Fetching
 
-### [Shared] 始终清理 Subscription
+### [Shared] 始终清理订阅
 
 ```tsx
 useEffect(() => {
@@ -308,7 +308,7 @@ useEffect(() => {
 }, [roomId, serverUrl]);
 ```
 
-### [React DOM] Browser Event Subscription
+### [React DOM] Browser 事件订阅
 
 ```tsx
 useEffect(() => {
@@ -320,9 +320,9 @@ useEffect(() => {
 }, []);
 ```
 
-### [React Native] Native Event Subscription
+### [React Native] Native 事件订阅
 
-React Native event API 通常返回带 `remove` method 的 subscription object。应以项目实际安装的 React Native 版本确认 API contract。
+React Native 事件 API 通常返回一个带 `remove` 方法的 subscription 对象。应根据项目实际安装的 React Native 版本确认 API contract。
 
 ```tsx
 import { AppState } from 'react-native';
@@ -342,11 +342,11 @@ function AppStateStatus() {
 }
 ```
 
-### 使用 Ignore Flag Fetch Data
+### 使用 ignore flag 请求数据
 
-项目已有 framework loader、query library 或 client-side cache 时应优先复用。下面的手动 Effect 只演示 stale-response protection；它本身不提供 cache、deduplication、retry 或 waterfall prevention。
+项目已有 framework loader、query library 或 client cache 时应优先复用。下面的手动 Effect 只演示如何防止过期响应覆盖新结果；它本身不提供缓存、请求去重、重试或防止请求瀑布。
 
-request API 支持 cancellation 时使用 `AbortController`。底层 operation 无法取消时，ignore flag 仍可避免 stale response 更新 state。
+请求 API 支持取消时使用 `AbortController`。底层操作无法取消时，ignore flag 仍可避免过期响应更新 state。
 
 ```tsx
 useEffect(() => {
@@ -367,9 +367,9 @@ useEffect(() => {
 }, [userId]);
 ```
 
-### Development Double-Fire 是预期行为
+### 开发环境重复执行是预期行为
 
-Strict Mode 会在第一次真实 Effect setup 前额外执行一轮仅限 development 的 setup-cleanup cycle。应把它视为 stress test：让 cleanup 与 setup 对称，而不是屏蔽额外执行。
+Strict Mode 会在第一次真实 Effect setup 前，额外执行一轮仅限开发环境的 setup-cleanup cycle。应把它视为压力测试：让 cleanup 和 setup 对称，而不是屏蔽额外执行。
 
 ```tsx
 // BAD: Hiding the symptom
@@ -390,7 +390,7 @@ useEffect(() => {
 
 ## Ref Patterns
 
-### [Shared] Ref 保存不影响 Render 的值
+### [Shared] Ref 保存不影响 render 的值
 
 ```tsx
 // GOOD: Ref for timeout ID (doesn't affect UI)
@@ -415,7 +415,7 @@ function Counter() {
 }
 ```
 
-### [Shared] 避免在 Render 期间读写 `ref.current`
+### [Shared] 避免在 render 期间读写 `ref.current`
 
 ```tsx
 // BAD: Reading/writing ref during render
@@ -454,7 +454,7 @@ function CachedComponent() {
 }
 ```
 
-### [Shared Pattern, React DOM Example] Dynamic List 的 Ref Callback
+### [Shared, React DOM 示例] 动态列表的 ref callback
 
 ```tsx
 // BAD: Can't call useRef in a loop
@@ -500,7 +500,7 @@ function MyInput({ ref }) {
 }
 ```
 
-### [React Native] Imperative Host Method
+### [React Native] 命令式 host method
 
 ```tsx
 import { Button, TextInput } from 'react-native';
@@ -519,7 +519,7 @@ function SearchField() {
 
 ## [Shared] Custom Hook Patterns
 
-### Hook 共享 Logic，而不是 State
+### Hook 共享逻辑，而不是 state
 
 ```tsx
 // Each call gets independent state — these are two separate online status subscriptions
@@ -532,7 +532,7 @@ function SaveButton() {
 }
 ```
 
-### 只有调用 Hook 的 Function 才命名为 `useXxx`
+### 只有调用 Hook 的函数才命名为 `useXxx`
 
 ```tsx
 // BAD: useXxx prefix but doesn't call any hooks
@@ -553,7 +553,7 @@ function useAuth() {
 
 ### Lifecycle Hook 应表达真实语义
 
-`useMount`、`useEffectOnce` 可以减少重复 template code，适用于 “once per mount” 本身就是明确 contract 的场景。风险不在 wrapper，而在于它是否隐藏了应该触发重新同步的 reactive dependency，或遗漏 cleanup。它们仍应遵守 Strict Mode 的额外 setup-cleanup cycle，不保证 development 环境只执行一次。
+`useMount`、`useEffectOnce` 可以减少重复模板代码，适用于“once per mount”本身就是明确约定的场景。风险不在封装本身，而在于它是否隐藏了应该触发重新同步的 reactive dependency，或遗漏 cleanup。它们仍应遵守 Strict Mode 的额外 setup-cleanup cycle，不保证开发环境只执行一次。
 
 ```tsx
 // GOOD: once-per-mount is the actual contract, and cleanup is preserved
@@ -579,7 +579,7 @@ useEffect(() => {
 
 ## Component Patterns
 
-### [Shared Pattern, React DOM Example] Controlled 与 Uncontrolled
+### [Shared, React DOM 示例] Controlled 与 Uncontrolled
 
 ```tsx
 // Uncontrolled: component owns state
@@ -594,7 +594,7 @@ function SearchInput({ query, onQueryChange }) {
 }
 ```
 
-### [Shared] 优先 Composition，避免 Prop Drilling
+### [Shared] 优先 composition，避免 prop drilling
 
 ```tsx
 // BAD: Prop drilling through intermediate components that don't use the value
