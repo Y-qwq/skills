@@ -23,10 +23,19 @@ The repository root is both the marketplace root and the single plugin root. Eve
 │   └── plugin.json
 ├── .codex-plugin/plugin.json
 └── skills/
-    └── hello-world/
+    ├── frontend-architecture-guide/
+    │   └── SKILL.md
+    └── react-best-practices/
         ├── SKILL.md
-        └── agents/openai.yaml
+        └── react-patterns.md
 ```
+
+## Included skills
+
+| Skill | Purpose |
+| --- | --- |
+| `frontend-architecture-guide` | Make component, state, abstraction boundary, and module organization decisions |
+| `react-best-practices` | Implement and review Effects, refs, memoization, custom Hooks, and component data flow |
 
 ## Install
 
@@ -54,11 +63,11 @@ Install interactively from the private repository:
 npx skills add git@github.com:Y-qwq/skills.git
 ```
 
-Install only the example skill for Claude Code and Codex:
+Install only `react-best-practices` for Claude Code and Codex:
 
 ```bash
 npx skills add git@github.com:Y-qwq/skills.git \
-  --skill hello-world \
+  --skill react-best-practices \
   --agent claude-code \
   --agent codex
 ```
@@ -73,7 +82,7 @@ Name: skills
 Branch: main
 ```
 
-CC Switch recursively discovers `skills/hello-world/SKILL.md`. Its current GitHub ZIP download flow does not authenticate to private repositories.
+CC Switch recursively discovers each `skills/*/SKILL.md`. Its current GitHub ZIP download flow does not authenticate to private repositories.
 
 ## Add a skill
 
