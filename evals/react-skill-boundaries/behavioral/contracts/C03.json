@@ -1,0 +1,32 @@
+{
+  "id": "C03",
+  "family": "architecture-only",
+  "critical": true,
+  "evaluation_tracks": [
+    "target"
+  ],
+  "expected_skills": [
+    "frontend-architecture-guide"
+  ],
+  "reference_policy": {
+    "architecture_levels": "must-not-read",
+    "react_patterns": "must-not-read"
+  },
+  "must_identify": [
+    "Cross-feature use is a signal to re-evaluate ownership, not a rule that promotes state to a global store.",
+    "The URL or route search parameters are the natural source of truth because sharing, refresh recovery, and browser history are explicit requirements.",
+    "Each route should own its current filter instance while shared code can own the filter grammar, parser, validator, and serializer.",
+    "Keeping the same values in both URL and a global store would create competing sources and synchronization risk."
+  ],
+  "acceptable": [
+    "Route-specific hooks that read and write search parameters through a shared typed codec.",
+    "A small feature-local adapter around the router API while keeping the canonical values in the URL.",
+    "Server cache keyed by the parsed filters for result data, without turning filter ownership into server-cache ownership."
+  ],
+  "must_not": [
+    "Keep a single global filter object solely because both features use the same fields.",
+    "Recommend live synchronization between the two routes despite the stated history behavior.",
+    "Duplicate canonical filter state between URL and Zustand without a distinct owner contract.",
+    "Treat the presence of a Zustand hook as a React runtime-semantics problem."
+  ]
+}

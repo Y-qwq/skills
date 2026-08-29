@@ -1,0 +1,31 @@
+{
+  "id": "C07",
+  "family": "architecture-only",
+  "critical": true,
+  "evaluation_tracks": [
+    "target"
+  ],
+  "expected_skills": [
+    "frontend-architecture-guide"
+  ],
+  "reference_policy": {
+    "architecture_levels": "must-read",
+    "react_patterns": "must-not-read"
+  },
+  "must_identify": [
+    "The refactor only adds directories, re-exports, a type alias, and a pass-through call; it does not create ownership, API, dependency, lifecycle, or test boundaries.",
+    "Feature importance and a possible display addition are not evidence for deeper architecture.",
+    "The structure should remain or become simpler unless a concrete business invariant or coordination responsibility emerges."
+  ],
+  "acceptable": [
+    "Reject or collapse the proposed layers and colocate the simple flow.",
+    "Keep only an extraction that has a current, named responsibility and independently improves the contract.",
+    "Describe the evidence that would justify rerunning the level decision later."
+  ],
+  "must_not": [
+    "Approve the refactor because domain/application/presentation names look architecturally clean.",
+    "Suggest filling every layer with more wrappers or interfaces to justify the move.",
+    "Use future complexity or feature importance as sufficient evidence.",
+    "Treat import paths as proof of a changed dependency direction."
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "id": "C14",
+  "family": "architecture-and-react-runtime",
+  "critical": true,
+  "evaluation_tracks": [
+    "target",
+    "preservation"
+  ],
+  "expected_skills": [
+    "frontend-architecture-guide",
+    "react-best-practices"
+  ],
+  "reference_policy": {
+    "architecture_levels": "must-not-read",
+    "react_patterns": "must-read"
+  },
+  "must_identify": [
+    "The cart's source of truth and required lifetime belong to the /shop route subtree, so CartProvider should move to the stable shop route layout: it survives navigation inside /shop and resets by unmounting when that flow ends.",
+    "CartProvider creates a new addLine callback and Context value object on unrelated parent renders, so the value identity changes and propagates to consumers even when lines is unchanged.",
+    "With Compiler coverage absent and profiler evidence present, use a functional setLines updater plus useCallback for addLine, and useMemo for the public Context value with complete dependencies.",
+    "The response must treat Provider scope/state ownership and Context value identity as two independent concerns requiring both architecture and React runtime guidance."
+  ],
+  "acceptable": [
+    "Compute totalCents directly from lines; it naturally changes only when lines changes, then include it in the memoized value dependencies.",
+    "Show CartProvider inside a ShopLayout or equivalent route-scoped owner without changing CartContextValue.",
+    "Use route remount integration coverage plus profiler or consumer render-count evidence."
+  ],
+  "must_not": [
+    "Do not promote the cart to a global store or persistent storage; that contradicts the stated route-scoped lifecycle.",
+    "Do not fix only Provider placement while leaving the confirmed Context identity churn, or fix only identity while leaving the wrong lifecycle owner.",
+    "Do not use memo on consumers as the cure for Context propagation.",
+    "Do not read the architecture-levels reference: this is a Provider scope decision, not module layering or a structure-level upgrade."
+  ]
+}

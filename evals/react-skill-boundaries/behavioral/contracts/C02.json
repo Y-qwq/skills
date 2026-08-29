@@ -1,0 +1,31 @@
+{
+  "id": "C02",
+  "family": "architecture-only",
+  "critical": true,
+  "evaluation_tracks": [
+    "target"
+  ],
+  "expected_skills": [
+    "frontend-architecture-guide"
+  ],
+  "reference_policy": {
+    "architecture_levels": "must-not-read",
+    "react_patterns": "must-not-read"
+  },
+  "must_identify": [
+    "isRecurring is not merely a visual toggle here: it selects two stable identities with different invariants, required inputs, save contracts, consumers, and change axes.",
+    "The optional-prop surface permits invalid combinations and forces non-null assertions because the component contract does not encode either workflow cleanly.",
+    "The split is justified by independent business contracts and ownership, not by a mechanical rule that every render branch deserves a component."
+  ],
+  "acceptable": [
+    "Expose SingleAppointmentEditor and RecurringSeriesEditor with focused required props, optionally retaining a thin routing wrapper when a caller genuinely needs it.",
+    "Use an explicit discriminated union when one public entry point is valuable, while still delegating the two workflows to clear internal owners.",
+    "Keep small shared display primitives below the two workflow components without forcing their business contracts back together."
+  ],
+  "must_not": [
+    "State that any boolean prop or any render branch automatically requires a component split.",
+    "Preserve one bag of optional props and rely on non-null assertions as the contract.",
+    "Treat this as an Effect, memoization, closure, ref, or other React runtime issue.",
+    "Introduce a config-driven renderer to encode both flows."
+  ]
+}

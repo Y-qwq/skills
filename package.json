@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "validate": "node scripts/validate.mjs",
+    "validate:evals": "node scripts/validate-react-skill-evals.mjs",
     "validate:skills": "npx --yes skills@1.5.19 add . --list",
-    "test": "npm run validate && npm run validate:skills"
+    "test": "npm run validate && npm run validate:evals && npm run validate:skills"
   },
   "engines": {
     "node": ">=20"

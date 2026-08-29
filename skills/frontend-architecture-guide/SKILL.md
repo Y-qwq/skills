@@ -63,7 +63,7 @@ UI 可以依赖业务 contract；业务规则不应反向依赖具体 UI。Prese
 
 ## 层级与结构升级
 
-只有任务涉及 module 层级选择、分层或结构升级时，才读取 [references/architecture-levels.md](references/architecture-levels.md)。该 reference 包含 Pure display、Small business component、Medium module、Complex page 的决策树和迁移信号；普通 component/Hook boundary review 不需要加载它。
+只有任务需要选择或比较 Pure display、Small business component、Medium module、Complex page 等 module 层级，判断是否应建立或移除 domain/application/presentation 等 layer boundary，或者评估一次结构升级或降级时，才读取 [references/architecture-levels.md](references/architecture-levels.md)。State ownership、Provider scope、component/Hook API、feature/file 归属、composition 或 abstraction 判断本身都不是读取理由；即使同时存在 React 运行时问题，只要不需要做上述层级决策，也不要读取该 reference。
 
 ## Review Checklist
 

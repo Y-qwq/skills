@@ -1,0 +1,34 @@
+{
+  "id": "C15",
+  "family": "architecture-and-react-runtime",
+  "critical": true,
+  "evaluation_tracks": [
+    "target",
+    "preservation"
+  ],
+  "expected_skills": [
+    "frontend-architecture-guide",
+    "react-best-practices"
+  ],
+  "reference_policy": {
+    "architecture_levels": "must-not-read",
+    "react_patterns": "must-read"
+  },
+  "must_identify": [
+    "The Effect captures the initial businessId, never resubscribes when it changes, and never unsubscribes, which explains both stale-business events and duplicate updates after remounts.",
+    "Capture the returned subscription, return cleanup that calls unsubscribe(), and include businessId in the Effect dependencies so the old subscription is removed before the new one is established.",
+    "The Hook is notifications-specific and has one notifications consumer, so it should be owned by the notifications feature rather than the generic shared hooks directory.",
+    "The response must use both runtime lifecycle guidance and architecture ownership guidance; a custom Hook file alone would not justify architecture, but the explicit feature-placement decision does."
+  ],
+  "acceptable": [
+    "Move the Hook to src/features/notifications/hooks/useNotificationInbox.ts or an equally clear notifications-owned location while keeping its public behavior.",
+    "Rely on the subscription's synchronous initial snapshot to replace unreadCount after a business switch.",
+    "Test businessId changes without unmounting, repeated mount/unmount, Strict Mode setup-cleanup, and absence of callbacks after cleanup."
+  ],
+  "must_not": [
+    "Do not keep an empty dependency list, suppress exhaustive-deps, or hide businessId behind useMount/useEffectOnce.",
+    "Do not use a ref guard to mask Strict Mode behavior.",
+    "Do not create a global notification store or Provider when the stated feature owner and single consumer do not require one.",
+    "Do not read architecture-levels for this straightforward ownership/file-location decision."
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "id": "C01",
+  "family": "architecture-only",
+  "critical": true,
+  "evaluation_tracks": [
+    "target"
+  ],
+  "expected_skills": [
+    "frontend-architecture-guide"
+  ],
+  "reference_policy": {
+    "architecture_levels": "must-not-read",
+    "react_patterns": "must-not-read"
+  },
+  "must_identify": [
+    "The public API admits competing controlled and uncontrolled sources without making the selected contract explicit.",
+    "Ownership must be chosen from source of truth, allowed writers, reset behavior, and caller contract; controlled is not an automatic universal preference.",
+    "The controlled caller currently passes both assigneeId and defaultAssigneeId, which the API permits even though their authority conflicts.",
+    "Reset and ticket-switch behavior must be explicit, such as a controlled owner, a keyed remount, or a dedicated reset/initialization contract rather than silently synchronizing two sources."
+  ],
+  "acceptable": [
+    "A controlled-only picker with each workflow owning its draft state.",
+    "A discriminated union or separately named controlled and uncontrolled APIs that makes invalid prop combinations unrepresentable.",
+    "Keeping an uncontrolled variant when its initialization and reset semantics are documented and explicit."
+  ],
+  "must_not": [
+    "Claim that controlled components are always architecturally superior regardless of the caller contract.",
+    "Recommend an Effect that mirrors assigneeId or defaultAssigneeId into local state as the primary ownership solution.",
+    "Move this local selection into global state without an application-level lifecycle requirement.",
+    "Load react-best-practices merely because useState or a custom component is present."
+  ]
+}

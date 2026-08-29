@@ -1,0 +1,31 @@
+{
+  "id": "C12",
+  "family": "react-runtime-only",
+  "critical": true,
+  "evaluation_tracks": [
+    "preservation"
+  ],
+  "expected_skills": [
+    "react-best-practices"
+  ],
+  "reference_policy": {
+    "architecture_levels": "must-not-read",
+    "react_patterns": "must-read"
+  },
+  "must_identify": [
+    "AppLifecycleObserver has a real once-per-mount contract and symmetric cleanup, so useMount is semantically valid there even though spelling it as useEffect with an empty list would also be possible.",
+    "RoomSession incorrectly hides reactive roomId and serverUrl inputs; replace that useMount call with an Effect that depends on both values and disconnects the superseded connection.",
+    "Once per mount does not promise a single development setup under Strict Mode; setup and cleanup must tolerate the extra development cycle."
+  ],
+  "acceptable": [
+    "Retain useMount for AppLifecycleObserver or replace it with an equivalent dependency-free Effect for clarity, as long as the answer distinguishes its valid contract from RoomSession.",
+    "Recommend an exhaustive-deps-friendly useMount wrapper policy that is limited to callbacks with no reactive inputs.",
+    "Verify subscription cleanup and connection replacement under prop changes and Strict Mode remount simulation."
+  ],
+  "must_not": [
+    "Do not declare every useMount/useEffectOnce usage inherently invalid or inherently safe.",
+    "Do not add a ref guard to force one setup in Strict Mode.",
+    "Do not leave RoomSession on an empty dependency list or merely document the captured values.",
+    "Do not load architecture guidance for this explicitly runtime-only lifecycle comparison."
+  ]
+}

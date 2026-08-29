@@ -1,0 +1,30 @@
+{
+  "id": "C11",
+  "family": "react-runtime-only",
+  "critical": true,
+  "evaluation_tracks": [
+    "preservation"
+  ],
+  "expected_skills": [
+    "react-best-practices"
+  ],
+  "reference_policy": {
+    "architecture_levels": "must-not-read",
+    "react_patterns": "must-read"
+  },
+  "must_identify": [
+    "WorkspaceProvider creates a new refresh callback and a new value object on every render, so Context propagation sees a changed value identity even when workspace is unchanged.",
+    "Because Compiler coverage is explicitly absent and profiling already identified the identity boundary, stabilize refresh with useCallback and the Context value with useMemo using complete dependencies.",
+    "Explain that consumers must still rerender when the workspace value they read actually changes."
+  ],
+  "acceptable": [
+    "Use useCallback with workspace.id and useMemo with workspace and refresh, or an equivalent dependency-complete stabilization.",
+    "Mention profiling again after the change to confirm that clock-only parent renders no longer propagate through Context.",
+    "Note that memoizing WorkspaceStatus alone cannot block updates from a Context value it consumes."
+  ],
+  "must_not": [
+    "Do not move the Provider, change its scope, split the Context contract, or revisit state ownership when the prompt explicitly fixes those decisions.",
+    "Do not claim memo prevents a consumer from responding to real Context updates.",
+    "Do not load frontend architecture guidance merely because the target is a Provider."
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "critical_ids": [
+    "T01", "T02", "T05", "T06", "T07", "T08", "T11", "T13", "T14", "T17", "T18", "T19"
+  ],
+  "labels": {
+    "T01": "architecture-only",
+    "T02": "architecture-only",
+    "T03": "architecture-only",
+    "T04": "architecture-only",
+    "T05": "architecture-only",
+    "T06": "architecture-only",
+    "T07": "react-runtime-only",
+    "T08": "react-runtime-only",
+    "T09": "react-runtime-only",
+    "T10": "react-runtime-only",
+    "T11": "react-runtime-only",
+    "T12": "react-runtime-only",
+    "T13": "both",
+    "T14": "both",
+    "T15": "both",
+    "T16": "both",
+    "T17": "neither",
+    "T18": "neither",
+    "T19": "neither",
+    "T20": "neither"
+  }
+}

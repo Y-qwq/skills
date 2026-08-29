@@ -1,0 +1,32 @@
+{
+  "id": "C09",
+  "family": "architecture-only",
+  "critical": true,
+  "evaluation_tracks": [
+    "target"
+  ],
+  "expected_skills": [
+    "frontend-architecture-guide"
+  ],
+  "reference_policy": {
+    "architecture_levels": "must-not-read",
+    "react_patterns": "must-not-read"
+  },
+  "must_identify": [
+    "The reusable boundary is the invoice editing contract and its business invariants, not the current UI component.",
+    "Returning generic field setters and raw dispatch leaks representation and lets each consumer bypass or duplicate invariants.",
+    "A stable owner should expose intent-level actions and derived validity/save contract, with pure currency and discount rules extracted for direct testing and reuse where useful.",
+    "The task is custom Hook API and state/action ownership despite involving a Hook; no independent React runtime issue is present."
+  ],
+  "acceptable": [
+    "A focused useInvoiceEditor controller with actions such as changeCurrency, setDiscount, and save or getValidatedDraft.",
+    "Pure model/rule functions used by a reducer or controller and shared by both editors.",
+    "Keeping UI-specific rendering and layout outside the reusable editing owner."
+  ],
+  "must_not": [
+    "Load react-best-practices solely because the target is a custom Hook or uses useReducer.",
+    "Recommend useCallback, useMemo, Effect dependencies, cleanup, refs, or stale-closure fixes without evidence.",
+    "Expose only generic setters or raw dispatch while leaving invariants in each component.",
+    "Read the architecture-levels reference for an ordinary Hook and component boundary review."
+  ]
+}
