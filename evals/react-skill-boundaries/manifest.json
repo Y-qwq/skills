@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "cases": [
+    { "id": "C01", "prompt": "behavioral/cases/C01/prompt.md", "fixtures": "behavioral/cases/C01/fixture", "contract": "behavioral/contracts/C01.json" },
+    { "id": "C02", "prompt": "behavioral/cases/C02/prompt.md", "fixtures": "behavioral/cases/C02/fixture", "contract": "behavioral/contracts/C02.json" },
+    { "id": "C03", "prompt": "behavioral/cases/C03/prompt.md", "fixtures": "behavioral/cases/C03/fixture", "contract": "behavioral/contracts/C03.json" },
+    { "id": "C05", "prompt": "behavioral/cases/C05/prompt.md", "fixtures": "behavioral/cases/C05/fixture", "contract": "behavioral/contracts/C05.json" },
+    { "id": "C06", "prompt": "behavioral/cases/C06/prompt.md", "fixtures": "behavioral/cases/C06/fixture", "contract": "behavioral/contracts/C06.json" },
+    { "id": "C07", "prompt": "behavioral/cases/C07/prompt.md", "fixtures": "behavioral/cases/C07/fixture", "contract": "behavioral/contracts/C07.json" },
+    { "id": "C09", "prompt": "behavioral/cases/C09/prompt.md", "fixtures": "behavioral/cases/C09/fixture", "contract": "behavioral/contracts/C09.json" },
+    { "id": "C10", "prompt": "behavioral/cases/C10/prompt.md", "fixtures": "behavioral/cases/C10/fixture", "contract": "behavioral/contracts/C10.json" },
+    { "id": "C11", "prompt": "behavioral/cases/C11/prompt.md", "fixtures": "behavioral/cases/C11/fixture", "contract": "behavioral/contracts/C11.json" },
+    { "id": "C12", "prompt": "behavioral/cases/C12/prompt.md", "fixtures": "behavioral/cases/C12/fixture", "contract": "behavioral/contracts/C12.json" },
+    { "id": "C14", "prompt": "behavioral/cases/C14/prompt.md", "fixtures": "behavioral/cases/C14/fixture", "contract": "behavioral/contracts/C14.json" },
+    { "id": "C15", "prompt": "behavioral/cases/C15/prompt.md", "fixtures": "behavioral/cases/C15/fixture", "contract": "behavioral/contracts/C15.json" }
+  ]
+}

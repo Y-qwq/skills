@@ -1,0 +1,31 @@
+{
+  "id": "C10",
+  "family": "react-runtime-only",
+  "critical": true,
+  "evaluation_tracks": [
+    "preservation"
+  ],
+  "expected_skills": [
+    "react-best-practices"
+  ],
+  "reference_policy": {
+    "architecture_levels": "must-not-read",
+    "react_patterns": "must-read"
+  },
+  "must_identify": [
+    "The AppState subscription is never removed, so remounts and Strict Mode's development setup-cleanup cycle can leave multiple active listeners.",
+    "Capture the NativeEventSubscription returned by AppState.addEventListener and return an Effect cleanup that calls subscription.remove().",
+    "Treat the problem as React Native Effect setup/cleanup behavior, not as component ownership or file organization.",
+    "Verification must exercise mount, unmount, remount, and AppState transitions, with one refresh per active transition and no callback after unmount."
+  ],
+  "acceptable": [
+    "Keep refreshSession in the dependency list because it is a reactive input, even though the prompt says the caller currently keeps it stable.",
+    "Mention Strict Mode as a useful cleanup stress test rather than a production duplicate-subscription bug by itself.",
+    "Use a focused unit or integration test that mocks the native subscription boundary and asserts remove is called."
+  ],
+  "must_not": [
+    "Do not use a ref or module-level flag to suppress the second Strict Mode setup.",
+    "Do not recommend the browser addEventListener/removeEventListener contract or the removed AppState.removeEventListener API for this stated React Native version.",
+    "Do not move the component, invent a Provider, or load frontend architecture guidance for this runtime-only request."
+  ]
+}

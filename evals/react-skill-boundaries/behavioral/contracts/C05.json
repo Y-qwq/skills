@@ -1,0 +1,31 @@
+{
+  "id": "C05",
+  "family": "architecture-only",
+  "critical": true,
+  "evaluation_tracks": [
+    "target"
+  ],
+  "expected_skills": [
+    "frontend-architecture-guide"
+  ],
+  "reference_policy": {
+    "architecture_levels": "must-read",
+    "react_patterns": "must-not-read"
+  },
+  "must_identify": [
+    "A second independent data source is not by itself a reason to upgrade to Complex Page.",
+    "The panels are separate units with independent lifecycle and recovery, so combining their loading, errors, or refresh would invent coordination rather than express an invariant.",
+    "The proposed layers are pass-through organization without a demonstrated domain or application boundary."
+  ],
+  "acceptable": [
+    "Keep a simple composing page and let each panel own its query presentation contract.",
+    "Extract focused query adapters or pure rules only if they have independent value.",
+    "Classify each panel independently rather than treating the entire feature folder as one unit."
+  ],
+  "must_not": [
+    "Recommend Complex Page merely because two queries exist.",
+    "Create shared lifecycle or error recovery that contradicts the independent behavior.",
+    "Require empty or pass-through domain, application, presentation, or infrastructure layers.",
+    "Load react-best-practices solely because query hooks appear in TSX."
+  ]
+}

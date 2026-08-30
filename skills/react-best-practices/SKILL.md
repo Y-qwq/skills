@@ -1,17 +1,19 @@
 ---
 name: react-best-practices
 description: >
-  Use when implementing, reviewing, or debugging React Effects, dependencies, stale closures, refs,
-  derived state, memoization, custom Hook lifecycle behavior, component data flow, composition, Context,
-  or renderer integration. Not for styling or component, state, module, and file boundaries;
-  use frontend-architecture-guide.
+  Use whenever implementing, refactoring, reviewing, or debugging React runtime behavior involving
+  Effects, dependencies and cleanup, stale closures, refs, derived values, memoization or React Compiler,
+  custom Hook lifecycle behavior, Context value identity and re-renders, Strict Mode, or renderer
+  integration. Apply proactively during broader React reviews when these runtime concerns are present.
+  Not for component or Hook API design, composition, state ownership, Provider scope, abstractions,
+  module boundaries, or file organization; use frontend-architecture-guide.
 ---
 
 # React Best Practices
 
-优先遵循 React 的数据流模型，再考虑使用 escape hatch（逃生舱）。Escape hatch 指必要时绕开通常的声明式或自动优化路径，以获得更直接的控制；它是例外入口，不等于错误用法。例如，Effect 用于连接外部系统，手动 memoization 用于精确控制 React Compiler 未覆盖的边界。应根据项目的 React Compiler、renderer 和既有 data layer 调整做法，不要机械照搬示例。
+优先遵循 React 的 render/commit 与数据流语义，再考虑使用 escape hatch（逃生舱）。Effect 用于连接外部系统，ref 用于不参与 render 的可变值，手动 memoization 用于 React Compiler 未覆盖或存在明确 identity/performance contract 的边界。应根据项目的 React Compiler、renderer 和既有 data layer 调整做法，不要机械照搬示例。
 
-本 skill 聚焦 React API 和 component 内部的数据流。Component 拆分、state 归属、module boundary 和文件组织等架构问题，交由 `frontend-architecture-guide`。
+本 skill 只负责 React 运行时语义。Component 或 Hook API、composition、state/action ownership、Provider scope、abstraction、module boundary 与文件归属由 `frontend-architecture-guide` 负责。只有任务同时包含独立的结构判断和运行时判断时才共触发；纯运行时问题不会因为目标文件是 component 或 Hook 而自动加载 Architecture。
 
 ## 开始前确认
 
@@ -22,88 +24,72 @@ description: >
 3. 确认 renderer：React DOM、React Native，或同时支持两者的共享 package。
 4. 确认项目现有的数据请求归属，例如 framework loader、query library 或 client cache。
 
-不同 renderer 的示例不能直接互换：`window`、DOM node 和 `flushSync` 属于 React DOM；native 事件订阅和命令式 host method 应遵循 React Native contract。
+不同 renderer 的 API 不能直接互换：`window`、DOM node 和 `flushSync` 属于 React DOM；native 事件订阅和命令式 host method 应遵循 React Native contract。
 
-## 核心原则：Effect 是 escape hatch（逃生舱）
+## Effect 是 escape hatch
 
-Effect 用于“走出” React，与外部系统同步。**大部分 component 逻辑都不应使用 Effect。** 编写 Effect 前先问：“能否不用 Effect 完成？”
+Effect 用于“走出” React，与外部系统同步。编写 Effect 前先判断：
 
-## 决策树
+1. 响应用户交互：使用 event handler。
+2. 根据 props/state 计算值：在 render 阶段直接计算。
+3. 缓存计算结果或保持 identity：先遵循 React Compiler 策略；只有存在具体收益或 contract 时才手动 memoization。
+4. props 变化时需要重新创建本地 state：使用 `key` 表达实例边界。
+5. 与外部系统同步：使用 dependency 完整且 cleanup 对称的 Effect。
+6. 获取数据：使用项目既有 data layer；只有没有合适 owner 时才在 Effect 中请求。
+7. Effect 中需要读取最新 commit 的 non-reactive 值：考虑 `useEffectEvent`。
+8. 保存不触发 render 的可变值：使用 ref。
 
-1. **响应用户交互？** 使用 event handler
-2. **根据 props/state 计算值？** 在 render 阶段直接计算
-3. **缓存计算结果或保持 identity？** 先遵循 React Compiler 策略；只有存在具体收益时才手动 memoization
-4. **props 变化时重置 state？** 使用 `key` prop
-5. **与外部系统同步？** 使用带 cleanup 的 Effect
-6. **获取数据？** 使用项目既有 data layer；只有没有合适归属时才使用 Effect
-7. **Effect 中需要 non-reactive 逻辑？** 使用 `useEffectEvent`
-8. **保存不触发 render 的可变值？** 使用 ref
+手动请求必须处理过期响应与 cleanup。项目已有 data layer 时，不要在 component 内重复实现缓存、请求去重、重试或防止请求瀑布。
 
-## 何时使用 Effect
+## Dependency、Cleanup 与 Closure
 
-Effect 用于和 **外部系统** 同步，例如 browser API（WebSocket、IntersectionObserver）、React Native API（AppState、native 事件订阅）、第三方非 React 库、平台事件监听，以及命令式 host object（video、map、native view）。
+- Dependency list 应准确描述会触发重新同步的 reactive input；先修正 Effect 结构，再考虑 lint suppression。
+- Setup 与 cleanup 必须对称，包括 Strict Mode 在开发环境执行的额外 setup-cleanup cycle。
+- 使用 updater function、把 object/function 移入 Effect，或使用 `useEffectEvent`，应基于真实同步 contract，而不是隐藏 stale closure。
+- `useEffectEvent` 只承载属于 Effect、但不应触发重新同步的逻辑；不要把 reactive dependency 偷渡进去，也不要从 render 或其他 component 调用它。
 
-当 component 确实拥有该同步职责，且项目没有合适的 loader、query library 或 cache 时，可以在 Effect 中手动请求数据。手动请求必须处理过期响应和 cleanup。项目已有 data layer 时，不要在各 component 内重复实现缓存、请求去重、重试或防止请求瀑布。
+## Derived Values 与 Memoization
 
-## 不应使用 Effect 的场景
+- 派生值在 render 阶段计算，不用 Effect 镜像成另一份 state。
+- React Compiler 覆盖目标代码时，默认直接编写计算和函数，让 Compiler 处理 memoization。
+- 未覆盖或跳过编译时，只有存在可测量 render 成本或明确 identity contract，才使用 `useMemo`、`useCallback` 或 `memo`。
+- Effect、native/third-party identity boundary，以及 profiler 证明编译产物不足时，手动 memoization 可以作为 escape hatch。
+- Memoization 只能优化性能或满足外部 identity contract，不能成为业务正确性的前提。
 
-- 派生 state（derived state）：在 render 阶段直接计算
-- 昂贵计算（expensive calculation）：先直接计算，再遵循项目的 React Compiler 或 memoization 策略
-- props 变化时重置 state：使用 `key` prop
-- 响应用户事件：使用 event handler
-- 通知 parent state 变化：在同一个 event handler 中同时更新
-- Effect 链：直接计算 derived state，并在同一个 event handler 中完成更新
+## Context Runtime Behavior
 
-## Memoization 与 React Compiler
+本 skill 只检查 Context 的运行时传播，不决定 Provider 放在 route、feature 还是 app scope：
 
-- **React Compiler 覆盖目标代码：** 默认直接编写计算和函数，由 React Compiler 自动 memoization。
-- **React Compiler 未启用、跳过或未覆盖目标：** 只有存在可测量的 render 成本或明确的 identity contract 时，才使用 `useMemo`、`useCallback` 或 `memo`。
-- **例外场景（escape hatch）：** Effect、native 或第三方 identity boundary，以及 profiler 证明 React Compiler 产物不足时，仍可手动 memoization。
-- 不要机械删除编译后代码中已有的 memoization；先验证行为和性能。
-- Memoization 只能用于性能优化，不能成为业务正确性的前提。
+- 区分 consumer rerender 是由 Provider `value` identity 改变、实际读取的数据改变，还是 parent render 引起。
+- React Compiler 未覆盖或外部 identity contract 需要显式控制时，可稳定 Provider `value` 与 callback；先用 profiler 证明问题。
+- 不要假设 `memo` 能阻止 consumer 响应其读取的 Context value 更新。
+- 若解决方案涉及拆分 Context contract、移动 Provider 或改变 state/action owner，转由 `frontend-architecture-guide` 判断。
 
-## Effect Event
+## Ref 与 Imperative API
 
-- 使用 `useEffectEvent` 前，确认已安装的 React 和 Hooks lint 版本支持它。
-- 只把 `useEffectEvent` 用于属于 Effect、但需要读取最近一次 commit 的 props/state，且不应触发重新同步的逻辑。
-- Effect Event 只能从同一 component 的 Effect 或其他 Effect Event 中调用；不要在 render 阶段调用，也不要传给其他 component 或 Hook。
-- 不要用 Effect Event 隐藏 reactive dependency。需要触发 Effect 重新同步的值仍应保留在 dependency list 中。
-- Effect Event 函数的 identity 有意保持不稳定，不应加入 dependency array。
+- Ref 用于不影响 render 的值，例如 timer ID、host node reference 和 imperative handle。
+- 避免在 render 阶段读写 `ref.current`；窄例外是结果稳定、行为可预测的一次性初始化。
+- 动态列表使用 ref callback，不要在循环中调用 `useRef`。
+- 使用 `useImperativeHandle` 限制调用方可访问的命令式 API。
+- UI 依赖的数据应放在 state 中，不能用 mutable ref 绕过 render。
 
-## Ref
+## Custom Hook Runtime
 
-- 用于不影响 render 的值，例如 timer ID、host node reference 和 imperative handle
-- 避免在 render 阶段读写 `ref.current`；唯一的窄例外是结果稳定、行为可预测的一次性初始化
-- 动态列表使用 ref callback，不要在循环中调用 `useRef`
-- 使用 `useImperativeHandle` 限制 parent 可访问的命令式 API
+- 每次调用 Custom Hook 都拥有独立的 state 与 Effect 实例；Hook 共享逻辑，不共享运行时实例。
+- 只有实际调用其他 Hook 的函数才命名为 `useXxx`。
+- `useMount`、`useEffectOnce` 只能表达真实的 once-per-mount contract，并且必须保留 cleanup。
+- Lifecycle wrapper 不得隐藏 reactive dependency，也不得用来规避 Strict Mode 的额外 setup-cleanup 检查；若捕获值应触发重新同步，改用 dependency 明确的 Effect 或调整 contract。
+- Hook 的公开 API、职责拆分和 feature/file 归属属于 Architecture，不在本 skill 中决定。
 
-## Custom Hook
+## Review Checklist
 
-- 共享逻辑，而不是共享 state；每次调用都有独立的 state 实例
-- 只有实际调用其他 Hook 的函数才命名为 `useXxx`，否则使用普通函数
-- 当 once-per-mount 就是真实 contract，且团队已统一语义时，`useMount`、`useEffectOnce` 可以合理减少重复模板代码
-- 不要用 lifecycle Hook 隐藏 reactive dependency：callback 捕获的值若应触发重新同步，应改用带明确 dependency 的 `useEffect` 或重新设计 Hook API；同时保留 cleanup contract
-- 每个 Custom Hook 聚焦一个具体使用场景
+- 每个 Effect 是否在同步外部系统，或有明确理由承担手动请求？
+- Dependency 是否完整，closure 是否读取了与同步 contract 不一致的旧值？
+- Setup 与 cleanup 是否对称，并能通过 Strict Mode 的开发期检查？
+- Derived value 是否避免了 Effect 镜像和重复 state？
+- 手动 memoization 是否符合 Compiler 覆盖情况，并有性能或 identity 证据？
+- Context rerender 是否定位到 value identity 或真实数据传播，而不是误判 Provider scope？
+- Ref 是否只保存不参与 render 的值，imperative API 是否与 renderer contract 一致？
+- Custom Hook lifecycle 是否暴露 dependency、cleanup 和 once-per-mount 语义？
 
-## Component 模式
-
-- Controlled：parent 持有 state；uncontrolled：component 持有 state
-- 优先通过 `children` composition，避免 prop drilling
-- 用 boolean prop 切换大块 component 树（`isEditing`、`isThread`、`hideAttachments`）通常意味着 composition 设计异味；不同使用场景优先拆成独立 composition
-- 复杂的可复用 UI 优先使用带 provider-scoped state/action 的 compound component，避免带大量 optional prop 的 monolithic component
-- Context 既可用于 scoped component family，也可用于真正的 global state，前提是它定义了后代 component 使用的局部接口
-- UI 变体直接 render JSX；除非 config 本身就是真实 domain 数据，否则不要构建 config-array mini-framework
-- 同级 component 或外部控制器需要共享同一组 state/action 时，提升 provider boundary
-- 仅在 React DOM integration 必须于 state 更新后同步读取 DOM 时，谨慎使用 `flushSync`
-
-## 审查清单
-
-- 每个 Effect 都在同步外部系统，或是有明确理由的手动数据请求。
-- Effect dependency 准确描述 reactive input；禁用 lint 必须是例外且有说明。
-- Setup 和 cleanup 相互对称，包括 development 环境额外执行的 setup-cleanup cycle。
-- 手动 memoization 符合 React Compiler 策略，并有明确的性能或 identity 理由。
-- Ref 没有让 render 依赖 mutable non-reactive state。
-- 平台专属 API 与目标 renderer 一致。
-- 数据请求遵循项目数据架构；手动实现时已处理过期结果。
-
-需要具体实现示例时，按需读取 [react-patterns.md](./react-patterns.md)。其中明确标注了 Shared、React DOM 和 React Native 的适用范围。
+需要具体运行时示例时，按需读取 [react-patterns.md](react-patterns.md)。其中明确标注了 Shared、React DOM 和 React Native 的适用范围。

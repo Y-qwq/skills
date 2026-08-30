@@ -1,0 +1,32 @@
+{
+  "id": "C06",
+  "family": "architecture-only",
+  "critical": true,
+  "evaluation_tracks": [
+    "target"
+  ],
+  "expected_skills": [
+    "frontend-architecture-guide"
+  ],
+  "reference_policy": {
+    "architecture_levels": "must-read",
+    "react_patterns": "must-not-read"
+  },
+  "must_identify": [
+    "The reservation and quote require genuine coordination because validity, confirmation, invalidation, and recovery share a version-consistency invariant.",
+    "Individual query success flags do not prove the pair is coherent; the accepted reservationVersion and policyRevision must be owned together.",
+    "Reuse by both page and sidebar plus shared coordination justifies an application owner, with pure validity rules or domain contracts separated where useful.",
+    "This is a Complex Page/application-coordination case because of invariant and lifecycle, not because there are two data sources."
+  ],
+  "acceptable": [
+    "A focused useCancellationFlow application Hook/controller that exposes coherent states and intent-level actions.",
+    "Pure domain rules for quote validity plus an application owner for fetching, invalidation, retry, and confirm.",
+    "Presentation components that consume the flow contract without independently composing raw query success flags."
+  ],
+  "must_not": [
+    "Treat the two queries as independent merely because they use separate hooks.",
+    "Recommend Complex Page based only on query count or insist on every named physical layer.",
+    "Leave version consistency and recovery scattered across each presentation consumer.",
+    "Turn this into an Effect-dependency review absent a demonstrated runtime issue."
+  ]
+}

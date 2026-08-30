@@ -8,9 +8,10 @@
 - [Effect anti-patterns](#shared-effect-anti-patterns)
 - [Effect dependencies](#shared-effect-dependencies)
 - [Effect cleanup and fetching](#effect-cleanup-and-fetching)
+- [Context runtime behavior](#shared-context-runtime-behavior)
 - [Ref patterns](#ref-patterns)
 - [Custom Hook patterns](#shared-custom-hook-patterns)
-- [Component patterns](#component-patterns)
+- [Renderer integration](#renderer-integration)
 
 ## Renderer Labels
 
@@ -124,12 +125,6 @@ function Toggle({ onChange }) {
   }
 }
 
-// BEST: Fully controlled component
-function Toggle({ isOn, onChange }) {
-  function handleClick() {
-    onChange(!isOn);
-  }
-}
 ```
 
 ### Effect 链
@@ -388,6 +383,45 @@ useEffect(() => {
 }, []);
 ```
 
+## [Shared] Context Runtime Behavior
+
+### 定位 Provider `value` identity 导致的 rerender
+
+先用 React DevTools Profiler 区分实际 Context 数据变化、Provider `value` identity 变化和普通 parent render。React Compiler 覆盖目标代码时，先检查编译结果与 profiler，再决定是否需要手动 memoization；下面的显式 memoization 适用于未覆盖代码或明确的外部 identity contract。
+
+```tsx
+// BAD without compiler coverage: a new object and callback are created on every render.
+function AuthProvider({ currentUser, children }) {
+  const login = credentials => authenticate(credentials);
+
+  return (
+    <AuthContext.Provider value={{ currentUser, login }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+// GOOD when profiling shows value identity is the cause.
+function AuthProvider({ currentUser, children }) {
+  const login = useCallback(
+    credentials => authenticate(credentials),
+    []
+  );
+  const value = useMemo(
+    () => ({ currentUser, login }),
+    [currentUser, login]
+  );
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+```
+
+`memo` 不能阻止 consumer 响应它读取的 Context value 更新。Provider 应放在哪个 scope、Context contract 是否要拆分，以及 state/action 归谁所有，属于 Architecture 判断，不由这个运行时示例决定。
+
 ## Ref Patterns
 
 ### [Shared] Ref 保存不影响 render 的值
@@ -577,47 +611,7 @@ useEffect(() => {
 }, [roomId, serverUrl]);
 ```
 
-## Component Patterns
-
-### [Shared, React DOM 示例] Controlled 与 Uncontrolled
-
-```tsx
-// Uncontrolled: component owns state
-function SearchInput() {
-  const [query, setQuery] = useState('');
-  return <input value={query} onChange={e => setQuery(e.target.value)} />;
-}
-
-// Controlled: parent owns state — more composable, easier to test
-function SearchInput({ query, onQueryChange }) {
-  return <input value={query} onChange={e => onQueryChange(e.target.value)} />;
-}
-```
-
-### [Shared] 优先 composition，避免 prop drilling
-
-```tsx
-// BAD: Prop drilling through intermediate components that don't use the value
-<App user={user}>
-  <Layout user={user}>
-    <Header user={user}>
-      <Avatar user={user} />
-    </Header>
-  </Layout>
-</App>
-
-// GOOD: Pass the rendered element, not raw data
-<App>
-  <Layout>
-    <Header avatar={<Avatar user={user} />} />
-  </Layout>
-</App>
-
-// GOOD: Context for a visible scoped subtree or truly global state
-<UserContext.Provider value={user}>
-  <App />
-</UserContext.Provider>
-```
+## Renderer Integration
 
 ### [React DOM] 使用 `flushSync` 同步更新 DOM
 

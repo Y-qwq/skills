@@ -1,0 +1,20 @@
+{"id":"T01","request":"完整 review 这个 React feature 的 component、state 和 custom Hook 边界。"}
+{"id":"T02","request":"这个 Provider 应该放在 route 还是 app scope？"}
+{"id":"T03","request":"这个表单组件应该设计成 controlled 还是 uncontrolled API？"}
+{"id":"T04","request":"这些 boolean props 是否应该改成 composition 或 compound component？"}
+{"id":"T05","request":"页面新增第二个独立 query 后，是否应该升级成 Complex page？"}
+{"id":"T06","request":"两个 feature 都使用这组筛选条件，应该放 URL、Provider 还是 global store？"}
+{"id":"T07","request":"这个 Effect 为什么在开发环境重复订阅？"}
+{"id":"T08","request":"Context value 为什么导致所有 consumer rerender？"}
+{"id":"T09","request":"interval callback 为什么总是读到旧的 count？"}
+{"id":"T10","request":"启用 React Compiler 后还需要保留 useMemo 和 useCallback 吗？"}
+{"id":"T11","request":"useMount 隐藏了 dependency，而且 Strict Mode 下行为异常，应该怎么修？"}
+{"id":"T12","request":"共享组件里用了 flushSync 和 window，为什么 React Native 运行失败？"}
+{"id":"T13","request":"修复 subscription cleanup，同时决定这个 Hook 应该放在哪个 feature。"}
+{"id":"T14","request":"检查 Provider 的 subtree scope，并解决 Context value identity 引起的额外 rerender。"}
+{"id":"T15","request":"把逻辑提取成 custom Hook，同时修正 Effect dependency。"}
+{"id":"T16","request":"重新设计 controlled API，并修复 onSubmit callback 的 stale closure。"}
+{"id":"T17","request":"把按钮改成蓝色并增加圆角。"}
+{"id":"T18","request":"commit 并 push 当前改动。"}
+{"id":"T19","request":"排查普通后端 API 500 日志。"}
+{"id":"T20","request":"为数据库表新增一个索引 migration。"}
