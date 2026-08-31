@@ -1,0 +1,31 @@
+{
+  "id": "W01",
+  "critical": true,
+  "focus": [
+    "initialization",
+    "cross-repository coordination",
+    "single-writer context"
+  ],
+  "must_observe": [
+    "Creates exactly one canonical workstream folder under the supplied temporary root",
+    "Captures outcome, scope, acceptance, both workspaces, and the backend-to-frontend contract dependency",
+    "Defines bounded backend and frontend work items with ownership, acceptance, verification, and expected receipts",
+    "Orders or gates frontend integration on an explicit backend schema version while allowing only justified parallel work",
+    "Keeps shared context writes with the lead and requires workers to return receipts",
+    "Includes an integrated partial-failure verification rather than accepting two local success claims",
+    "Reports deliveries, verification status, decisions, and remaining work without claiming simulated work is complete"
+  ],
+  "must_not_observe": [
+    "Creates one context folder per repository",
+    "Lets workers edit shared context files directly",
+    "Treats independent task support as permission for operations outside the user request",
+    "Closes or archives the workstream after planning"
+  ],
+  "evidence": [
+    "context artifacts",
+    "task contracts",
+    "dependency plan",
+    "integration checkpoint",
+    "user summary"
+  ]
+}
