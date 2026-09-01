@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "W01",
+      "prompt": "cases/W01/prompt.md",
+      "fixtures": "cases/W01/fixture",
+      "contract": "contracts/W01.json"
+    },
+    {
+      "id": "W02",
+      "prompt": "cases/W02/prompt.md",
+      "fixtures": "cases/W02/fixture",
+      "contract": "contracts/W02.json"
+    },
+    {
+      "id": "W03",
+      "prompt": "cases/W03/prompt.md",
+      "fixtures": "cases/W03/fixture",
+      "contract": "contracts/W03.json"
+    }
+  ]
+}
