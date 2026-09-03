@@ -6,8 +6,16 @@
     "live-authority reconciliation",
     "execution fallback"
   ],
+  "behaviors": [
+    "resume-existing-workstream",
+    "live-authority-reconciliation",
+    "execution-fallback",
+    "legacy-status-migration"
+  ],
   "must_observe": [
     "Resumes the existing inbox-refresh workstream instead of creating another folder",
+    "Maps legacy planned to backlog and re-evaluates readiness, waiting to backlog with an explicit blocker, and cancelled or superseded to their terminal lifecycle values",
+    "Maps legacy completed and receipt completion claims to reported first and does not mark them verified until current lead verification provides evidence",
     "Treats the live service-api version 20 and renamed field as current authority over stale context and receipt claims",
     "Updates the frontend task contract to consume version 20 and the renamed field",
     "Falls back from unavailable independent sessions to an internal worker or inline execution without asking the user to manage it",
@@ -16,6 +24,7 @@
   ],
   "must_not_observe": [
     "Uses service-api version 19 solely because the worker receipt says it completed",
+    "Automatically upgrades a legacy completed status or receipt claim to verified without current lead evidence",
     "Stops because independent sessions are unavailable",
     "Asks the user to manually relay the backend change to the frontend worker",
     "Archives the workstream after the frontend task finishes"

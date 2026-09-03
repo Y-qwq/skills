@@ -3,22 +3,31 @@
   "critical": true,
   "focus": [
     "initialization",
+    "backlog-first capture",
     "cross-repository coordination",
     "single-writer context"
+  ],
+  "behaviors": [
+    "capture-default",
+    "readiness-lifecycle-separation",
+    "single-canonical-context",
+    "cross-repository-dependency"
   ],
   "must_observe": [
     "Creates exactly one canonical workstream folder under the supplied temporary root",
     "Captures outcome, scope, acceptance, both workspaces, and the backend-to-frontend contract dependency",
-    "Defines bounded backend and frontend work items with ownership, acceptance, verification, and expected receipts",
+    "Defines bounded backend and frontend backlog work items with ownership, readiness, lifecycle, acceptance, verification, and expected receipts",
+    "Uses the default capture mode and leaves the new tasks in lifecycle backlog without starting a worker or making a delivery change",
     "Orders or gates frontend integration on an explicit backend schema version while allowing only justified parallel work",
     "Keeps shared context writes with the lead and requires workers to return receipts",
-    "Includes an integrated partial-failure verification rather than accepting two local success claims",
-    "Reports deliveries, verification status, decisions, and remaining work without claiming simulated work is complete"
+    "Defines a future integrated partial-failure verification rather than accepting two local success claims",
+    "Reports backlog, readiness, scheduling state, decisions, and remaining work without claiming simulated work is complete"
   ],
   "must_not_observe": [
     "Creates one context folder per repository",
     "Lets workers edit shared context files directly",
     "Treats independent task support as permission for operations outside the user request",
+    "Schedules or executes a task during the capture turn",
     "Closes or archives the workstream after planning"
   ],
   "evidence": [

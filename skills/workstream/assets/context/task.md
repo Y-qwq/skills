@@ -1,8 +1,16 @@
 ---
 id: "{{task_id}}"
 workstream_id: "{{workstream_id}}"
-status: planned
-owner: "{{owner}}"
+readiness: "{{readiness}}"
+lifecycle: backlog
+priority: normal
+blocked_by: []
+depends_on: []
+owner: "{{task_owner}}"
+lead: "{{lead}}"
+execution_target: null
+one_shot_schedule_request: null
+execution_override: null
 created_at: "{{created_at}}"
 updated_at: "{{updated_at}}"
 ---
@@ -14,6 +22,13 @@ updated_at: "{{updated_at}}"
 # Contribution to outcome
 
 {{outcome_connection}}
+
+# Ownership
+
+- Workstream owner: {{workstream_owner}}
+- Lead: {{lead}}
+- Task owner: {{task_owner}}
+- Execution target: null until scheduled
 
 # Scope
 
@@ -30,6 +45,8 @@ updated_at: "{{updated_at}}"
 - Inputs: {{inputs}}
 - Consumers: {{consumers}}
 - Blocking tasks: {{blocking_tasks}}
+- `blocked_by`: {{blocked_by}}
+- Dependencies satisfied: {{dependencies_satisfied}}
 
 # Working area
 
@@ -40,6 +57,8 @@ updated_at: "{{updated_at}}"
 
 - Allowed mutations: {{allowed_mutations}}
 - Stop when: {{stopping_condition}}
+- One-shot schedule request: {{one_shot_schedule_request}}
+- Pre-ready execution override: {{execution_override}}
 
 # Acceptance
 

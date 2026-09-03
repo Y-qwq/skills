@@ -1,6 +1,6 @@
 # Workstream smoke evaluations
 
-这组最小 corpus 验证 `workstream` 初版最重要的行为边界：建立跨 repo workstream、恢复后协调依赖、执行可恢复 mutation，以及只在用户明确完成时清理。
+这组最小 corpus 验证 `workstream` 的 backlog-first 行为边界：默认捕获而不执行、按 one-shot request 调度、拆分 readiness 与 lifecycle、迁移旧 status、按 execution mode 调度、恢复后协调依赖、执行可恢复 mutation、压缩已验证 Task，以及只在用户明确完成时清理。
 
 ## Protocol
 
@@ -16,4 +16,4 @@
 npm run validate:evals
 ```
 
-该命令只验证 corpus、skill resources 和 context templates 的结构，并在临时目录中检查模板可以安全复制。它不执行独立模型，也不证明语义行为已经通过。初版投入真实使用后，把观察到的失败收敛成新的 case，而不是预先枚举所有理论边界。
+该命令验证 corpus、behavior coverage、skill resources 和 context templates 的结构，并在临时目录中检查模板可以安全复制。它不执行独立模型，也不证明语义行为已经通过。投入真实使用后，把观察到的失败收敛成新的 case，而不是预先枚举所有理论边界。

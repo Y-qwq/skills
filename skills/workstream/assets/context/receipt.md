@@ -1,7 +1,8 @@
 ---
 task_id: "{{task_id}}"
 workstream_id: "{{workstream_id}}"
-status: "{{status}}"
+result: "{{result}}"
+execution_target: "{{execution_target}}"
 reported_at: "{{reported_at}}"
 ---
 
@@ -24,6 +25,11 @@ reported_at: "{{reported_at}}"
 # Deviations and decisions
 
 - {{deviation_or_decision}}
+
+# Task handoff
+
+- Lifecycle reported by this receipt: `reported`; lead must verify before marking the Task `verified`.
+- Readiness at execution: `{{readiness}}`
 
 # Open issues
 
