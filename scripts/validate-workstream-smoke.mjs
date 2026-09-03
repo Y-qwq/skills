@@ -67,11 +67,23 @@ async function collectFiles(directory, base = directory) {
 
 const manifest = await parseJson(path.join(evalRoot, "manifest.json"), "manifest.json");
 if (manifest.version !== 1) fail("manifest.json: version must be 1");
-if (!Array.isArray(manifest.cases) || manifest.cases.length !== 3) {
-  fail("manifest.json: initial smoke corpus must contain exactly three cases");
+if (!Array.isArray(manifest.cases) || manifest.cases.length < 4) {
+  fail("manifest.json: backlog smoke corpus must contain at least four cases");
 }
 
 const caseIds = new Set();
+const coveredBehaviors = new Set();
+const requiredBehaviors = new Set([
+  "capture-default",
+  "one-shot-schedule-request",
+  "readiness-lifecycle-separation",
+  "pre-ready-explicit-override",
+  "blocked-ready-not-runnable",
+  "mode-does-not-relax-constraints",
+  "verified-compaction",
+  "project-declared-owner",
+  "legacy-status-migration",
+]);
 for (const entry of manifest.cases ?? []) {
   const label = `manifest ${entry.id ?? "<missing>"}`;
   if (!/^W\d{2}$/.test(entry.id ?? "")) fail(`${label}: invalid id`);
@@ -106,7 +118,14 @@ for (const entry of manifest.cases ?? []) {
   if (!contractPath) continue;
   const contract = await parseJson(contractPath, `${label} contract`);
   if (contract.id !== entry.id) fail(`${label}: contract id mismatch`);
-  if (contract.critical !== true) fail(`${label}: initial smoke cases must be critical`);
+  if (contract.critical !== true) fail(`${label}: smoke cases must be critical`);
+  if (!Array.isArray(contract.behaviors) || contract.behaviors.length === 0) {
+    fail(`${label}: behaviors must be a non-empty array`);
+  } else if (contract.behaviors.some((value) => typeof value !== "string" || value.trim().length === 0)) {
+    fail(`${label}: behaviors must contain non-empty strings`);
+  } else {
+    for (const behavior of contract.behaviors) coveredBehaviors.add(behavior);
+  }
   for (const key of ["focus", "must_observe", "must_not_observe", "evidence"]) {
     if (!Array.isArray(contract[key]) || contract[key].length === 0) {
       fail(`${label}: ${key} must be a non-empty array`);
@@ -114,6 +133,10 @@ for (const entry of manifest.cases ?? []) {
       fail(`${label}: ${key} must contain non-empty strings`);
     }
   }
+}
+
+for (const behavior of requiredBehaviors) {
+  if (!coveredBehaviors.has(behavior)) fail(`smoke corpus missing behavior coverage: ${behavior}`);
 }
 
 try {
@@ -147,7 +170,7 @@ for (const relativePath of skillFiles) {
 }
 
 const templateRoot = path.join(skillRoot, "assets", "context");
-const expectedTemplates = ["context.md", "decisions.md", "receipt.md", "state.md", "task.md"];
+const expectedTemplates = ["context.md", "decisions.md", "history.md", "receipt.md", "state.md", "task.md"];
 try {
   const actualTemplates = (await readdir(templateRoot, { withFileTypes: true }))
     .filter((entry) => entry.isFile())
@@ -163,8 +186,9 @@ try {
 const requiredHeadings = {
   "context.md": ["# Outcome", "# Scope", "# Acceptance", "# Workspace map", "# Ownership and interfaces", "# User policies"],
   "decisions.md": ["# Decisions"],
-  "receipt.md": ["# Outcome", "# Changes", "# Validation", "# Observed state", "# Open issues", "# Recovery"],
-  "state.md": ["# Current status", "# Active tasks", "# Integration checkpoints", "# Live references", "# Recovery points", "# Next actions"],
+  "history.md": ["# History", "# Retained evidence", "# Compaction notes"],
+  "receipt.md": ["# Outcome", "# Changes", "# Validation", "# Observed state", "# Task handoff", "# Open issues", "# Recovery"],
+  "state.md": ["# Current status", "# Scheduling policy", "# Backlog counts", "# Scheduled/in-progress/reported hot tasks", "# Next dispatch candidates", "# Integration checkpoints", "# Live references", "# Recovery points", "# Key blockers", "# Next actions"],
   "task.md": ["# Objective", "# Scope", "# Dependencies", "# Authority and stopping conditions", "# Acceptance", "# Verification", "# Expected receipt"],
 };
 for (const [file, headings] of Object.entries(requiredHeadings)) {
@@ -172,6 +196,24 @@ for (const [file, headings] of Object.entries(requiredHeadings)) {
     const content = await readFile(path.join(templateRoot, file), "utf8");
     for (const heading of headings) {
       if (!content.includes(heading)) fail(`assets/context/${file}: missing ${heading}`);
+    }
+  } catch (error) {
+    fail(`assets/context/${file}: ${error.message}`);
+  }
+}
+
+const requiredTemplateFields = {
+  "context.md": ["context_owner:", "active_context_root:", "active_branch_or_ref:", "default_execution_mode:", "default_wip_limit:", "pre_ready_policy:"],
+  "history.md": ["closed_at", "Evidence or recovery pointer", "active/hot"],
+  "receipt.md": ["result:", "reported", "readiness"],
+  "state.md": ["Readiness", "Lifecycle", "Blocked by", "Execution target", "Runnable is derived", "Backlog count", "One-shot request"],
+  "task.md": ["readiness:", "lifecycle:", "blocked_by:", "execution_target: null", "one_shot_schedule_request:", "execution_override:"],
+};
+for (const [file, fields] of Object.entries(requiredTemplateFields)) {
+  try {
+    const content = await readFile(path.join(templateRoot, file), "utf8");
+    for (const field of fields) {
+      if (!content.includes(field)) fail(`assets/context/${file}: missing scheduling field ${field}`);
     }
   } catch (error) {
     fail(`assets/context/${file}: ${error.message}`);

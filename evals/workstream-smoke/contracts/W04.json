@@ -1,0 +1,42 @@
+{
+  "id": "W04",
+  "critical": true,
+  "focus": [
+    "project-declared context placement",
+    "readiness and lifecycle",
+    "execution modes and scheduling predicate"
+  ],
+  "behaviors": [
+    "project-declared-owner",
+    "capture-default",
+    "one-shot-schedule-request",
+    "readiness-lifecycle-separation",
+    "pre-ready-explicit-override",
+    "blocked-ready-not-runnable",
+    "mode-does-not-relax-constraints"
+  ],
+  "must_observe": [
+    "Uses the project-declared canonical owner and active context root rather than inventing a second root under the harness boundary",
+    "Captures A, B, C and D as durable backlog work items with readiness separate from lifecycle",
+    "Leaves all four tasks in lifecycle backlog and starts no worker during Turn 1 capture",
+    "Records D as ready but blocked by API-01 rather than treating blocked as a readiness or lifecycle value",
+    "In Turn 2 records a one-shot schedule request for A and an explicit per-task override for B limited to reversible research with uncertainty accepted",
+    "In Turn 2 schedules only A and explicitly authorized B without changing the global capture mode",
+    "In Turn 3 accelerate schedules only tasks allowed by the same predicate and stays within the WIP limit",
+    "Does not schedule unready C or blocked ready D",
+    "Keeps dependencies, authority, branch and shared-write safety constraints unchanged while accelerate is active"
+  ],
+  "must_not_observe": [
+    "Creates a second canonical context folder for another workspace",
+    "Starts a worker during the capture turn",
+    "Executes C or schedules D while API-01 remains unresolved",
+    "Uses accelerate to make an unready task runnable or to grant blanket mutation permission"
+  ],
+  "evidence": [
+    "project placement declaration",
+    "backlog task records",
+    "state projection before and after scheduling",
+    "explicit B override",
+    "scheduling decision and user summary"
+  ]
+}
