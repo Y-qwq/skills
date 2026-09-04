@@ -11,6 +11,21 @@ lead: "{{lead}}"
 execution_target: null
 one_shot_schedule_request: null
 execution_override: null
+verification_depth: targeted
+verification:
+  claims:
+    - id: "{{claim_id}}"
+      acceptance_refs:
+        - "{{acceptance_id}}"
+      required_evidence:
+        - kind: "{{evidence_kind}}"
+          ref_or_version: "{{exact_ref_or_version}}"
+          environment: "{{environment}}"
+          command_or_source: "{{command_or_source}}"
+  integration_gates:
+    - id: "{{integration_gate_id}}"
+      between: "{{producer_and_consumer}}"
+      required_evidence: "{{integration_evidence}}"
 created_at: "{{created_at}}"
 updated_at: "{{updated_at}}"
 ---
@@ -68,10 +83,16 @@ updated_at: "{{updated_at}}"
 
 - {{verification_requirement}}
 
+## Verification contract
+
+- Depth: `{{verification_depth}}` (`receipt-only` | `targeted` | `independent`)
+- Claims must map to acceptance refs and required evidence.
+- Integration gates must identify producer, consumer, expected version or contract, and the evidence that proves compatibility.
+
 # Context pointers
 
 - {{context_pointer}}
 
 # Expected receipt
 
-Return outcome, actual changes, validation evidence, refs or artifacts, deviations, open issues, and recovery information.
+Return outcome, actual changes, worker validation, claim-evidence mapping, exact refs/versions/environments, commands or sources, results, observed_at, limitations/unverified gaps, deviations, open issues, and recovery information. The receipt reports `reported`; Lead verification decides whether the Task can become `verified`.

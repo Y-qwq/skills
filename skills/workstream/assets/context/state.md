@@ -2,8 +2,9 @@
 workstream_id: "{{workstream_id}}"
 updated_at: "{{updated_at}}"
 execution_mode: capture
-wip_limit: "{{wip_limit}}"
+wip_limit: 4
 pre_ready_policy: explicit_only
+default_verification_depth: targeted
 ---
 
 # Current status
@@ -13,7 +14,10 @@ pre_ready_policy: explicit_only
 # Scheduling policy
 
 - Mode: `{{execution_mode}}`
-- WIP limit: {{wip_limit}}
+- WIP limit: {{wip_limit}} (default: 4)
+- WIP count: {{wip_count}} (`scheduled` + `in_progress` + `reported`)
+- WIP excludes: `backlog`, `verified`, `cancelled`, `superseded`
+- Default verification depth: `targeted`
 - Pre-ready policy: `{{pre_ready_policy}}`
 - Runnable is derived from current lifecycle, blocker, dependencies, mode and explicit overrides; do not persist it.
 

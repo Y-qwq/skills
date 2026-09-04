@@ -12,12 +12,41 @@
     "execution-fallback",
     "legacy-status-migration"
   ],
+  "verification": {
+    "default_depth": "targeted",
+    "depths": ["receipt-only", "targeted", "independent"],
+    "receipt_fields": [
+      "claim",
+      "acceptance_refs",
+      "evidence_kind",
+      "ref_or_version",
+      "environment",
+      "command_or_source",
+      "result",
+      "observed_at",
+      "limitations_or_unverified_gaps",
+      "recovery_pointer"
+    ],
+    "lead_checks": ["evidence-binding", "acceptance-coverage", "integration-coverage"],
+    "escalation_triggers": [
+      "evidence-missing",
+      "evidence-stale",
+      "evidence-contradictory",
+      "acceptance-or-integration-gap",
+      "live-state-drift",
+      "flaky-signal",
+      "high-risk-or-irreversible",
+      "worker-unverified-gap",
+      "owner-requests-independent"
+    ]
+  },
   "must_observe": [
     "Resumes the existing inbox-refresh workstream instead of creating another folder",
     "Maps legacy planned to backlog and re-evaluates readiness, waiting to backlog with an explicit blocker, and cancelled or superseded to their terminal lifecycle values",
     "Maps legacy completed and receipt completion claims to reported first and does not mark them verified until current lead verification provides evidence",
     "Treats the live service-api version 20 and renamed field as current authority over stale context and receipt claims",
     "Updates the frontend task contract to consume version 20 and the renamed field",
+    "Audits current receipt evidence first and performs only the targeted checks needed for the live contract drift instead of repeating complete worker validation",
     "Falls back from unavailable independent sessions to an internal worker or inline execution without asking the user to manage it",
     "Verifies the generated client and frontend behavior against the live backend contract",
     "Keeps the workstream active until the full acceptance criteria are proven or the user explicitly closes it"

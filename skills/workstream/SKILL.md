@@ -14,7 +14,7 @@ description: >
 
 不要因为任务包含多个步骤就自动创建 workstream。若一个任务能够在当前上下文内直接完成，不需要跨任务协调或长期恢复，直接执行即可。
 
-默认是 backlog-first：收到用户的新想法、目标或变更时，先捕获或更新 Task，不自动派发或执行。`capture` 仍允许 owner 明确点名某个 Task 发出一次性“执行/排期”请求；ready Task 可据此排期，pre-ready 还必须在同一请求中接受不确定性并限定受控范围，unready 原 Task 不执行。其它调度规则见 [references/task-lifecycle-and-scheduling.md](references/task-lifecycle-and-scheduling.md)。
+默认是 backlog-first：收到用户的新想法、目标或变更时，先捕获或更新 Task，不自动派发或执行。默认策略是 `capture + wip_limit: 4`；WIP 只统计 `scheduled`、`in_progress` 和 `reported`，不统计 `backlog`、`verified`、`cancelled` 或 `superseded`。因此 capture 不会因为还有容量而自动开工，WIP 4 只在 owner 明确排期或切换到其它 execution mode 时限制在制数量。`capture` 仍允许 owner 明确点名某个 Task 发出一次性“执行/排期”请求；ready Task 可据此排期，pre-ready 还必须在同一请求中接受不确定性并限定受控范围，unready 原 Task 不执行。其它调度规则见 [references/task-lifecycle-and-scheduling.md](references/task-lifecycle-and-scheduling.md)。
 
 ## Start or resume
 
@@ -32,7 +32,7 @@ description: >
 2. **Capture and shape**：只为独立、可调度或需要长期跟踪的工作单元创建 Task；补齐 scope、acceptance、依赖、readiness 与 blocker。普通对话、context 写回和 delivery 动作写入已有记录，不单独建 Task。
 3. **Schedule**：根据 state 中的 execution mode、WIP、依赖、共享写入面和 readiness 派发可运行 Task；capture mode 不自动派发，但可响应单个 Task 的 one-shot schedule request。需要派发时读取 [references/delegation-and-coordination.md](references/delegation-and-coordination.md)。
 4. **Supervise**：跟进阻塞、回答 context 内可解决的问题，并在依赖或 scope 变化时主动调整其它 work item。
-5. **Integrate**：检查实际产物与当前状态，不把 worker 的完成声明当作充分证据；验证通过后才把 Task 标记为 `verified`。
+5. **Integrate**：先按 [references/delegation-and-coordination.md](references/delegation-and-coordination.md) 执行 evidence-first、incremental 的 Lead verification：审计 receipt 证据与当前 ref 的绑定、acceptance 覆盖和跨 Task 集成；没有风险信号时不要重复 worker 已完成的调查或验证。验证通过后才把 Task 标记为 `verified`。
 6. **Record and compact**：由 lead 更新共享 context、decision、task 状态和 delivery receipt；将已验证 Task 的稳定结论提升到权威 context 或 artifact，并压缩出热区。
 7. **Report**：向用户总结 backlog 变化、排期/执行结果、交付物、验证、关键判断和剩余事项，而不是复述操作流水账。
 
@@ -48,7 +48,7 @@ description: >
 
 某一种能力不可用时自动降级到下一种，不要仅因缺少独立 session 而停下。选择执行方式时仍需遵守当前 harness、用户 scope 与仓库规则。
 
-worker 只消费已排期的 Task packet，返回结构化 receipt；不得把 session 的完成状态直接当成 Task 的 `verified`。
+worker 只消费已排期的 Task packet，先在自己负责的范围内完成 worker validation，再返回结构化 receipt；不得把 session 的完成状态直接当成 Task 的 `verified`。Receipt 必须逐项映射 claim、acceptance 和 evidence；Lead verification 是独立的集成与证据判断，不是重复执行 worker 的默认理由。详细协议见 [references/delegation-and-coordination.md](references/delegation-and-coordination.md)。
 
 ## Authority and mutations
 
