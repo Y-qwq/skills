@@ -1,13 +1,19 @@
 ---
+schema_version: 2
 task_id: "{{task_id}}"
+attempt_id: "{{attempt_id}}"
 workstream_id: "{{workstream_id}}"
 result: "{{result}}"
 execution_target: "{{execution_target}}"
+readiness_at_execution: "{{readiness}}"
+started_at: "{{started_at}}"
 reported_at: "{{reported_at}}"
 requested_verification_depth: "{{requested_verification_depth}}"
-effective_verification_depth: null
 lead_verification:
-  status: pending
+  outcome: pending
+  effective_depth: null
+  decided_at: null
+  verified_at: null
   escalation_trigger: null
   additional_checks: []
 ---
@@ -24,11 +30,11 @@ lead_verification:
 
 - {{validation_and_result}}
 
-Worker validation records observations from the Task-owned scope. It is not Lead verification and does not by itself move the Task beyond `reported`.
+Worker validation records observations from this attempt's Task-owned scope. It is not Lead verification and does not by itself move the Task beyond `reported`.
 
 # Claim-evidence mapping
 
-Map every claim to the acceptance item it supports and to evidence observed after execution. The Task contract's required evidence is a specification; this table records actual evidence:
+Map every claim to a stable `AC-*` acceptance item and to evidence observed after this attempt. The Task contract's required evidence is a specification; this table records actual evidence:
 
 | Claim | Acceptance refs | Evidence kind | Exact ref/version | Environment | Command or source | Result | Observed at | Limitations or unverified gaps | Recovery pointer |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -42,6 +48,7 @@ Map every claim to the acceptance item it supports and to evidence observed afte
 
 # Observed state
 
+- Attempt identity is read from frontmatter.
 - {{ref_version_or_external_state}}
 
 # Deviations and decisions
@@ -50,13 +57,21 @@ Map every claim to the acceptance item it supports and to evidence observed afte
 
 # Task handoff
 
-- Lifecycle reported by this receipt: `reported`; lead must verify before marking the Task `verified`.
-- Readiness at execution: `{{readiness}}`
-- Requested verification depth from the Task: `{{requested_verification_depth}}` (default: `targeted`)
-- Effective verification depth applied by Lead: `{{effective_verification_depth}}`; it remains `null` until Lead performs verification, and any escalation must be recorded before changing it.
-- Lead verification status: `pending`; record status, escalation trigger and additional checks in `lead_verification` before changing it.
-- Escalation trigger: `{{escalation_trigger}}`
-- Additional checks: `{{additional_checks}}`
+- The worker returns a structured payload; the Lead creates this canonical attempt record and initially records the Task as `reported`.
+- After that write, the observed evidence and worker result are sealed. The Lead may update only the frontmatter `lead_verification` fields while making the lifecycle decision.
+- Read the worker result, requested/effective depth, outcome and timestamps from frontmatter; do not duplicate their current values in this body.
+- Every non-pending outcome records `decided_at`. `verified_at` is non-null only for `outcome: accepted` when the Task lifecycle is `verified`.
+- After a non-pending Lead decision, the entire attempt record is finalized. A retry creates a different `AT-*` file and never overwrites this one.
+
+Lead decisions have one current Task lifecycle truth:
+
+| Lead outcome | Task lifecycle | Required follow-up |
+| --- | --- | --- |
+| `accepted` | `verified` | Promote stable conclusions and compact when appropriate. |
+| `retry` | `backlog` | Preserve this attempt and create a new `AT-*` receipt on the next execution. |
+| `blocked` | `backlog` | Add an active typed `blockers[]` entry on the Task; do not invent a `blocked` lifecycle. |
+| `cancelled` | `cancelled` | Record owner decision and reason. |
+| `superseded` | `superseded` | Record the replacement Task or decision pointer. |
 
 # Limitations and unverified gaps
 

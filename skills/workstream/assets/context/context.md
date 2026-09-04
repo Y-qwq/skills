@@ -1,4 +1,5 @@
 ---
+schema_version: 2
 id: "{{workstream_id}}"
 name: "{{workstream_name}}"
 status: active
@@ -29,9 +30,9 @@ pre_ready_policy: explicit_only
 
 - {{excluded_scope}}
 
-# Acceptance
+# Workstream acceptance
 
-- {{acceptance_criterion}}
+- WAC-001: {{acceptance_criterion}}
 
 # Workspace map
 
@@ -47,16 +48,18 @@ pre_ready_policy: explicit_only
 
 - {{user_policy}}
 
-# Execution defaults and policies
+# Schema and runtime layout
 
-- Default execution mode: `{{default_execution_mode}}`
-- Default WIP limit: {{default_wip_limit}}
-- Default verification depth: `{{default_verification_depth}}`
-- Pre-ready policy: `{{pre_ready_policy}}`
-- Context owner: {{context_owner}}
-- Active context root: {{active_context_root}}
-- Active branch or ref: {{active_branch_or_ref}}
-- Archive root: {{archive_root}}
+- Schema version: `2`
+- Canonical open Task records: `tasks/<task-id>.md`
+- Preserved execution attempt records: `receipts/<task-id>/<attempt-id>.md`, where attempt IDs use `AT-001`, `AT-002`, ...
+- Owner-facing attention records: `reviews/<review-id>.md`, where review IDs use `RV-001`, `RV-002`, ...
+- Workstream acceptance IDs use `WAC-001`, `WAC-002`, ... . Task-local acceptance IDs use `AC-001`, `AC-002`, ... and are identified together with their Task ID; an attempt receipt's `task_id` supplies that Task scope.
+- `state.md` is a rebuildable projection. Task lifecycle, active typed blockers, attempt receipts, and review records are the sources of truth described in the schema references.
+
+# Canonical controls and placement
+
+Execution defaults, pre-ready policy, context owner, active root/ref and archive root are canonical in frontmatter. Read and update them there; do not duplicate their current values in the body.
 
 # Durable context sources
 

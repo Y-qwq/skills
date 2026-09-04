@@ -1,0 +1,63 @@
+{
+  "id": "W06",
+  "critical": true,
+  "schema": {
+    "version": 2,
+    "acceptance_id_prefix": "AC-",
+    "attempt_id_prefix": "AT-",
+    "review_id_prefix": "RV-"
+  },
+  "focus": [
+    "preserved execution attempts",
+    "failure recovery",
+    "lifecycle disposition"
+  ],
+  "behaviors": [
+    "schema-v2",
+    "stable-acceptance-ids",
+    "typed-dependencies-and-blockers",
+    "attempt-receipts",
+    "task-lifecycle-source-of-truth",
+    "retry-requeue",
+    "failure-disposition"
+  ],
+  "attempts": {
+    "receipt_path": "receipts/<task-id>/<attempt-id>.md",
+    "attempt_id_pattern": "^AT-[0-9]{3}$",
+    "acceptance_ref_pattern": "^AC-[0-9]{3}$",
+    "lead_outcomes": ["pending", "accepted", "retry", "blocked", "cancelled", "superseded"],
+    "required_lead_fields": [
+      "outcome",
+      "effective_depth",
+      "decided_at",
+      "verified_at",
+      "escalation_trigger",
+      "additional_checks"
+    ]
+  },
+  "must_observe": [
+    "Preserves failed T-101 attempt AT-001 and creates AT-002 for the retry instead of overwriting the first receipt",
+    "Returns the failed T-101 Task to backlog with Lead outcome retry before a new attempt is scheduled",
+    "Returns blocked T-102 to backlog with a typed active blocker and does not add blocked as a lifecycle",
+    "Marks obsolete T-103 superseded with a replacement Task pointer",
+    "Keeps Task lifecycle as the only current truth while receipts record per-attempt result and Lead decision evidence",
+    "Uses stable AC-* acceptance references in both attempts and claims",
+    "Accepts T-101 only after AT-002 evidence and sets verified_at only for the accepted decision",
+    "Records decided_at for retry, blocked, superseded, and accepted decisions and keeps old recovery pointers",
+    "Reports WIP and closeout from current Task lifecycles without counting archived evidence as a second Task"
+  ],
+  "must_not_observe": [
+    "Overwrites or deletes AT-001 when retrying T-101",
+    "Treats a failed or blocked worker result as verified",
+    "Uses a blocked lifecycle value or a second receipt-owned lifecycle as current truth",
+    "Uses verified_at as the timestamp for a retry, blocked, cancelled, or superseded decision",
+    "Reuses an A-001 acceptance or attempt ID in place of the AC-* and AT-* namespaces"
+  ],
+  "evidence": [
+    "Task records before and after Lead decisions",
+    "AT-001 and AT-002 attempt receipts",
+    "typed blocker and replacement pointers",
+    "Lead decision fields",
+    "user-facing closeout"
+  ]
+}

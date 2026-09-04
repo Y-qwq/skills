@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "cases": [
     {
       "id": "W01",
@@ -30,6 +30,20 @@
       "prompt": "cases/W05/prompt.md",
       "fixtures": "cases/W05/fixture",
       "contract": "contracts/W05.json"
+    },
+    {
+      "id": "W06",
+      "prompt": "cases/W06/prompt.md",
+      "fixtures": "cases/W06/fixture",
+      "contract": "contracts/W06.json",
+      "expected": "cases/W06/expected.json"
+    },
+    {
+      "id": "W07",
+      "prompt": "cases/W07/prompt.md",
+      "fixtures": "cases/W07/fixture",
+      "contract": "contracts/W07.json",
+      "expected": "cases/W07/expected.json"
     }
   ]
 }

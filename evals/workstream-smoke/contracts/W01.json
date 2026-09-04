@@ -1,6 +1,12 @@
 {
   "id": "W01",
   "critical": true,
+  "schema": {
+    "version": 2,
+    "acceptance_id_prefix": "AC-",
+    "attempt_id_prefix": "AT-",
+    "review_id_prefix": "RV-"
+  },
   "focus": [
     "initialization",
     "backlog-first capture",
@@ -8,6 +14,9 @@
     "single-writer context"
   ],
   "behaviors": [
+    "schema-v2",
+    "stable-acceptance-ids",
+    "typed-dependencies-and-blockers",
     "capture-default",
     "readiness-lifecycle-separation",
     "single-canonical-context",
@@ -16,10 +25,10 @@
   "must_observe": [
     "Creates exactly one canonical workstream folder under the supplied temporary root",
     "Captures outcome, scope, acceptance, both workspaces, and the backend-to-frontend contract dependency",
-    "Defines bounded backend and frontend backlog work items with ownership, readiness, lifecycle, acceptance, verification, and expected receipts",
+    "Defines bounded backend and frontend backlog work items with ownership, readiness, lifecycle, stable AC-* acceptance IDs, verification, and expected AT-* receipts",
     "Includes a structured verification contract with default targeted depth, claim-level required evidence, and a producer-consumer integration gate",
     "Uses the default capture mode and leaves the new tasks in lifecycle backlog without starting a worker or making a delivery change",
-    "Orders or gates frontend integration on an explicit backend schema version while allowing only justified parallel work",
+    "Orders or gates frontend integration on an explicit backend schema version while allowing only justified parallel work, using typed dependencies and blockers",
     "Keeps shared context writes with the lead and requires workers to return receipts",
     "Defines a future integrated partial-failure verification rather than accepting two local success claims",
     "Reports backlog, readiness, scheduling state, decisions, and remaining work without claiming simulated work is complete"
