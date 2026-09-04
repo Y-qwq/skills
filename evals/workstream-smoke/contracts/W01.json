@@ -17,6 +17,7 @@
     "Creates exactly one canonical workstream folder under the supplied temporary root",
     "Captures outcome, scope, acceptance, both workspaces, and the backend-to-frontend contract dependency",
     "Defines bounded backend and frontend backlog work items with ownership, readiness, lifecycle, acceptance, verification, and expected receipts",
+    "Includes a structured verification contract with default targeted depth, claim-level required evidence, and a producer-consumer integration gate",
     "Uses the default capture mode and leaves the new tasks in lifecycle backlog without starting a worker or making a delivery change",
     "Orders or gates frontend integration on an explicit backend schema version while allowing only justified parallel work",
     "Keeps shared context writes with the lead and requires workers to return receipts",

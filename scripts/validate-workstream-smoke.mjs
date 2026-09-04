@@ -73,6 +73,53 @@ if (!Array.isArray(manifest.cases) || manifest.cases.length < 4) {
 
 const caseIds = new Set();
 const coveredBehaviors = new Set();
+const verificationDepths = new Set(["receipt-only", "targeted", "independent"]);
+const wipCountedLifecycles = ["scheduled", "in_progress", "reported"];
+const wipExcludedLifecycles = ["backlog", "verified", "cancelled", "superseded"];
+const requiredEvidenceSpecFields = [
+  "kind",
+  "subject",
+  "required_environment",
+  "command_or_source",
+  "freshness_or_ref_requirement",
+];
+const requiredObservedEvidenceFields = [
+  "claim",
+  "acceptance_refs",
+  "evidence_kind",
+  "ref_or_version",
+  "environment",
+  "command_or_source",
+  "result",
+  "observed_at",
+  "limitations_or_unverified_gaps",
+  "recovery_pointer",
+];
+const requiredLeadVerificationFields = [
+  "requested_verification_depth",
+  "effective_verification_depth",
+  "status",
+  "escalation_trigger",
+  "additional_checks",
+];
+const verificationBehaviors = new Set([
+  "evidence-first-verification",
+  "verification-depths",
+  "verification-escalation",
+]);
+let verificationSchemaContracts = 0;
+const requiredLeadChecks = ["evidence-binding", "acceptance-coverage", "integration-coverage"];
+const requiredEscalationTriggers = [
+  "evidence-missing",
+  "evidence-stale",
+  "evidence-contradictory",
+  "acceptance-or-integration-gap",
+  "live-state-drift",
+  "flaky-signal",
+  "high-risk-or-irreversible",
+  "worker-unverified-gap",
+  "owner-requests-independent",
+];
 const requiredBehaviors = new Set([
   "capture-default",
   "one-shot-schedule-request",
@@ -83,6 +130,11 @@ const requiredBehaviors = new Set([
   "verified-compaction",
   "project-declared-owner",
   "legacy-status-migration",
+  "default-wip-limit",
+  "wip-lifecycle-calculation",
+  "evidence-first-verification",
+  "verification-depths",
+  "verification-escalation",
 ]);
 for (const entry of manifest.cases ?? []) {
   const label = `manifest ${entry.id ?? "<missing>"}`;
@@ -133,10 +185,60 @@ for (const entry of manifest.cases ?? []) {
       fail(`${label}: ${key} must contain non-empty strings`);
     }
   }
+
+  const requiresVerificationSchema = (contract.behaviors ?? []).some((behavior) => verificationBehaviors.has(behavior));
+  if (requiresVerificationSchema) {
+    verificationSchemaContracts += 1;
+    const verification = contract.verification;
+    if (!verification || typeof verification !== "object" || Array.isArray(verification)) {
+      fail(`${label}: verification must be a structured object for its declared behaviors`);
+    } else {
+      if (verification.default_depth !== "targeted") {
+        fail(`${label}: verification.default_depth must be targeted`);
+      }
+      if (!Array.isArray(verification.depths) || verification.depths.length !== verificationDepths.size
+        || new Set(verification.depths).size !== verification.depths.length
+        || verification.depths.some((depth) => !verificationDepths.has(depth))) {
+        fail(`${label}: verification.depths must enumerate receipt-only, targeted, independent`);
+      }
+      for (const [field, requiredValues] of [
+        ["required_evidence_spec_fields", requiredEvidenceSpecFields],
+        ["receipt_fields", requiredObservedEvidenceFields],
+        ["lead_verification_fields", requiredLeadVerificationFields],
+        ["lead_checks", requiredLeadChecks],
+        ["escalation_triggers", requiredEscalationTriggers],
+      ]) {
+        if (!Array.isArray(verification[field])
+          || requiredValues.some((value) => !verification[field].includes(value))) {
+          fail(`${label}: verification.${field} is missing required coverage`);
+        }
+      }
+    }
+  }
+
+  if (contract.wip !== undefined) {
+    if (!contract.wip || typeof contract.wip !== "object" || Array.isArray(contract.wip)) {
+      fail(`${label}: wip must be a structured object`);
+    } else {
+      if (contract.wip.default_limit !== 4) fail(`${label}: wip.default_limit must be 4`);
+      if (JSON.stringify(contract.wip.counted_lifecycles) !== JSON.stringify(wipCountedLifecycles)) {
+        fail(`${label}: wip.counted_lifecycles must be scheduled, in_progress, reported`);
+      }
+      if (JSON.stringify(contract.wip.excluded_lifecycles) !== JSON.stringify(wipExcludedLifecycles)) {
+        fail(`${label}: wip.excluded_lifecycles must be backlog, verified, cancelled, superseded`);
+      }
+      if (contract.wip.formula !== "count(lifecycle in counted_lifecycles)") {
+        fail(`${label}: wip.formula must define lifecycle-based counting`);
+      }
+    }
+  }
 }
 
 for (const behavior of requiredBehaviors) {
   if (!coveredBehaviors.has(behavior)) fail(`smoke corpus missing behavior coverage: ${behavior}`);
+}
+if (verificationSchemaContracts === 0) {
+  fail("smoke corpus must declare at least one contract with the verification behavior schema");
 }
 
 try {
@@ -187,7 +289,7 @@ const requiredHeadings = {
   "context.md": ["# Outcome", "# Scope", "# Acceptance", "# Workspace map", "# Ownership and interfaces", "# User policies"],
   "decisions.md": ["# Decisions"],
   "history.md": ["# History", "# Retained evidence", "# Compaction notes"],
-  "receipt.md": ["# Outcome", "# Changes", "# Validation", "# Observed state", "# Task handoff", "# Open issues", "# Recovery"],
+  "receipt.md": ["# Outcome", "# Changes", "# Validation", "# Claim-evidence mapping", "# Integration gate results", "# Observed state", "# Task handoff", "# Limitations and unverified gaps", "# Open issues", "# Recovery"],
   "state.md": ["# Current status", "# Scheduling policy", "# Backlog counts", "# Scheduled/in-progress/reported hot tasks", "# Next dispatch candidates", "# Integration checkpoints", "# Live references", "# Recovery points", "# Key blockers", "# Next actions"],
   "task.md": ["# Objective", "# Scope", "# Dependencies", "# Authority and stopping conditions", "# Acceptance", "# Verification", "# Expected receipt"],
 };
@@ -203,11 +305,11 @@ for (const [file, headings] of Object.entries(requiredHeadings)) {
 }
 
 const requiredTemplateFields = {
-  "context.md": ["context_owner:", "active_context_root:", "active_branch_or_ref:", "default_execution_mode:", "default_wip_limit:", "pre_ready_policy:"],
-  "history.md": ["closed_at", "Evidence or recovery pointer", "active/hot"],
-  "receipt.md": ["result:", "reported", "readiness"],
-  "state.md": ["Readiness", "Lifecycle", "Blocked by", "Execution target", "Runnable is derived", "Backlog count", "One-shot request"],
-  "task.md": ["readiness:", "lifecycle:", "blocked_by:", "execution_target: null", "one_shot_schedule_request:", "execution_override:"],
+  "context.md": ["context_owner:", "active_context_root:", "active_branch_or_ref:", "default_execution_mode:", "default_wip_limit: 4", "default_verification_depth: targeted", "pre_ready_policy:"],
+  "history.md": ["closed_at", "Evidence or recovery pointer", "active/hot", "Effective verification depth"],
+  "receipt.md": ["result:", "reported", "readiness", "requested_verification_depth:", "effective_verification_depth:", "lead_verification:", "escalation_trigger:", "additional_checks:", "Claim-evidence mapping", "Evidence kind", "Exact ref/version", "Environment", "Command or source", "Observed at", "Limitations or unverified gaps", "Recovery pointer", "Integration gate results", "Expected version or contract"],
+  "state.md": ["Readiness", "Lifecycle", "Blocked by", "Execution target", "Runnable is derived", "Backlog count", "One-shot request", "wip_limit: 4", "WIP count:", "scheduled` + `in_progress` + `reported", "WIP excludes", "Default verification depth"],
+  "task.md": ["readiness:", "lifecycle:", "blocked_by:", "execution_target: null", "one_shot_schedule_request:", "execution_override:", "verification_depth: targeted", "verification:", "required_evidence", "subject", "required_environment", "freshness_or_ref_requirement", "integration_gates", "Verification contract"],
 };
 for (const [file, fields] of Object.entries(requiredTemplateFields)) {
   try {
@@ -217,6 +319,32 @@ for (const [file, fields] of Object.entries(requiredTemplateFields)) {
     }
   } catch (error) {
     fail(`assets/context/${file}: ${error.message}`);
+  }
+}
+
+const delegationProtocol = await readFile(
+  path.join(skillRoot, "references", "delegation-and-coordination.md"),
+  "utf8",
+);
+for (const requiredToken of [
+  "Worker validation",
+  "Lead verification",
+  "Evidence binding",
+  "acceptance coverage",
+  "integration coverage",
+  "required_environment",
+  "freshness_or_ref_requirement",
+  "actual ref/version",
+  "observed evidence",
+  "receipt-only",
+  "targeted",
+  "independent",
+  "evidence 缺失",
+  "ref、version、environment",
+  "高风险、不可逆",
+]) {
+  if (!delegationProtocol.includes(requiredToken)) {
+    fail(`delegation-and-coordination.md: missing verification protocol coverage for ${requiredToken}`);
   }
 }
 

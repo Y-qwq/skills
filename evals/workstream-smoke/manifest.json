@@ -24,6 +24,12 @@
       "prompt": "cases/W04/prompt.md",
       "fixtures": "cases/W04/fixture",
       "contract": "contracts/W04.json"
+    },
+    {
+      "id": "W05",
+      "prompt": "cases/W05/prompt.md",
+      "fixtures": "cases/W05/fixture",
+      "contract": "contracts/W05.json"
     }
   ]
 }

@@ -1,0 +1,93 @@
+{
+  "id": "W05",
+  "critical": true,
+  "focus": [
+    "evidence-first incremental verification",
+    "WIP accounting",
+    "verification depth and escalation"
+  ],
+  "behaviors": [
+    "default-wip-limit",
+    "wip-lifecycle-calculation",
+    "evidence-first-verification",
+    "verification-depths",
+    "verification-escalation"
+  ],
+  "verification": {
+    "default_depth": "targeted",
+    "depths": ["receipt-only", "targeted", "independent"],
+    "required_evidence_spec_fields": [
+      "kind",
+      "subject",
+      "required_environment",
+      "command_or_source",
+      "freshness_or_ref_requirement"
+    ],
+    "receipt_fields": [
+      "claim",
+      "acceptance_refs",
+      "evidence_kind",
+      "ref_or_version",
+      "environment",
+      "command_or_source",
+      "result",
+      "observed_at",
+      "limitations_or_unverified_gaps",
+      "recovery_pointer"
+    ],
+    "lead_verification_fields": [
+      "requested_verification_depth",
+      "effective_verification_depth",
+      "status",
+      "escalation_trigger",
+      "additional_checks"
+    ],
+    "lead_checks": ["evidence-binding", "acceptance-coverage", "integration-coverage"],
+    "escalation_triggers": [
+      "evidence-missing",
+      "evidence-stale",
+      "evidence-contradictory",
+      "acceptance-or-integration-gap",
+      "live-state-drift",
+      "flaky-signal",
+      "high-risk-or-irreversible",
+      "worker-unverified-gap",
+      "owner-requests-independent"
+    ]
+  },
+  "wip": {
+    "default_limit": 4,
+    "formula": "count(lifecycle in counted_lifecycles)",
+    "counted_lifecycles": ["scheduled", "in_progress", "reported"],
+    "excluded_lifecycles": ["backlog", "verified", "cancelled", "superseded"]
+  },
+  "must_observe": [
+    "Reads the default capture mode, default WIP limit four, and targeted verification depth from the context",
+    "Calculates initial WIP as four from scheduled, in_progress, and reported tasks and excludes backlog tasks",
+    "Leaves scheduling unchanged during Turn 1 despite available backlog candidates",
+    "Keeps Task required_evidence as a pre-execution specification, records actual refs, environments, results, and observed_at only in receipts, and leaves effective verification depth null until Lead verification",
+    "Uses the complete receipt evidence for R-01 without repeating its local validation",
+    "Uses a targeted integration check for R-02 because the producer-consumer gate is missing, without rerunning all local worker checks",
+    "After verified work releases capacity, applies the effective WIP limit and runnable predicate before scheduling B-01",
+    "Escalates SEC-01 to independent verification because it is high-risk and its receipt is stale, incomplete, and observed in an unknown environment",
+    "Does not silently downgrade independent verification and keeps SEC-01 reported when the core evidence remains insufficient",
+    "Reports evidence binding, acceptance coverage, integration coverage, WIP calculation, verification depth, escalation reason, and remaining gaps"
+  ],
+  "must_not_observe": [
+    "Counts backlog, verified, cancelled, or superseded tasks toward WIP",
+    "Automatically schedules a task in capture mode",
+    "Invents actual ref or version values in a Task required_evidence specification before execution",
+    "Treats a worker completion claim or passed result without traceable evidence as Lead verification",
+    "Repeats the complete worker investigation or validation when the receipt evidence is current and acceptance-complete",
+    "Uses two local success claims as a substitute for the R-02 integration gate",
+    "Silently handles the high-risk SEC-01 task at receipt-only or targeted depth"
+  ],
+  "evidence": [
+    "context and state artifacts",
+    "task verification contracts",
+    "claim-evidence mappings",
+    "Lead verification record",
+    "WIP projection before and after scheduling",
+    "final user summary"
+  ]
+}

@@ -18,6 +18,7 @@
     "Maps legacy completed and receipt completion claims to reported first and does not mark them verified until current lead verification provides evidence",
     "Treats the live service-api version 20 and renamed field as current authority over stale context and receipt claims",
     "Updates the frontend task contract to consume version 20 and the renamed field",
+    "Audits current receipt evidence first and performs only the targeted checks needed for the live contract drift instead of repeating complete worker validation",
     "Falls back from unavailable independent sessions to an internal worker or inline execution without asking the user to manage it",
     "Verifies the generated client and frontend behavior against the live backend contract",
     "Keeps the workstream active until the full acceptance criteria are proven or the user explicitly closes it"

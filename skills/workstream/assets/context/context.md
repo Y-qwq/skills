@@ -10,7 +10,8 @@ active_context_root: "{{active_context_root}}"
 active_branch_or_ref: "{{active_branch_or_ref}}"
 archive_root: "{{archive_root}}"
 default_execution_mode: capture
-default_wip_limit: "{{default_wip_limit}}"
+default_wip_limit: 4
+default_verification_depth: targeted
 pre_ready_policy: explicit_only
 ---
 
@@ -50,6 +51,7 @@ pre_ready_policy: explicit_only
 
 - Default execution mode: `{{default_execution_mode}}`
 - Default WIP limit: {{default_wip_limit}}
+- Default verification depth: `{{default_verification_depth}}`
 - Pre-ready policy: `{{pre_ready_policy}}`
 - Context owner: {{context_owner}}
 - Active context root: {{active_context_root}}

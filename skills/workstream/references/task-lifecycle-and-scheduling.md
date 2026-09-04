@@ -10,6 +10,10 @@ lifecycle: backlog | scheduled | in_progress | reported | verified | cancelled |
 blocked_by: []
 one_shot_schedule_request: null
 execution_override: null
+verification_depth: targeted
+verification:
+  claims: []
+  integration_gates: []
 ```
 
 - `readiness` 表示任务定义是否足够成熟，不表示是否正在执行。
@@ -47,14 +51,16 @@ backlog → scheduled → in_progress → reported → verified
 - `backlog`：已捕获并值得持续跟踪，尚未排期执行。
 - `scheduled`：已选择执行目标、顺序或时间窗口，但 worker 尚未开始。
 - `in_progress`：执行目标已接手并正在工作。
-- `reported`：执行目标已返回 receipt，lead 尚未完成验收或集成验证。
-- `verified`：lead 已检查实际产物、依赖和集成 acceptance，并吸收稳定结论。
+- `reported`：执行目标已返回包含 claim-evidence mapping 的 receipt，lead 尚未完成验收或集成验证。
+- `verified`：lead 已按 verification contract 检查实际产物、依赖和集成 acceptance，并吸收稳定结论。
 - `cancelled`：owner 主动取消，不再执行。
 - `superseded`：由另一个 Task 或新方案替代；记录替代者指针。
 
 Task 的完成事件通常只会把 lifecycle 推进到 `reported`。`verified` 是 lead 的判断，必须有与 acceptance 相称的证据。Workstream 仍可能有其它 backlog 或未验证 Task，不能因单个 Task verified 而关闭。
 
-Receipt 使用独立的 `result` 记录执行观察，例如 `succeeded`、`partial`、`failed` 或 `blocked`；它不替代 Task 的 lifecycle，也不自动授予 `verified`。
+Receipt 使用独立的 `result` 记录执行观察，例如 `succeeded`、`partial`、`failed` 或 `blocked`；它不替代 Task 的 lifecycle，也不自动授予 `verified`。Receipt 中的 worker validation 与 Lead verification 是两个不同判断：前者说明 worker 在自己的边界内观察到了什么，后者决定 evidence 是否足以覆盖 acceptance 与 integration。
+
+Task 的 `verification_depth` 是执行前声明的 requested depth。Receipt 还要记录 `requested_verification_depth`，并将 `effective_verification_depth` 初始设为 `null`；只有 Lead 实际执行验证后才能填入 effective depth。Lead 因风险升级时保留原 requested 值，在 `lead_verification` 中记录状态、`escalation_trigger` 和 `additional_checks`。`history.md` 只记录 effective depth，避免把尚未完成 Lead 判断的声明当成最终事实。
 
 ## Capture and materialize
 
@@ -70,6 +76,18 @@ Receipt 使用独立的 `result` 记录执行观察，例如 `succeeded`、`part
 ## State projection
 
 `tasks/*.md` 是 open backlog 的 canonical board；它们可以持续积累 `unready`、`pre-ready` 和 `ready` Task。`state.md` 不是第二份 board，只保留 readiness/lifecycle 的聚合 counts、`scheduled`/`in_progress`/`reported` hot tasks、下一批可调度候选和关键 blocker。不要把全部 unready/pre-ready backlog 逐行复制到 `state.md`；恢复时按请求从 `tasks/` 加载需要的 Task。
+
+## WIP accounting
+
+默认 `wip_limit` 是 `4`。WIP 是一个调度容量约束，按当前 lifecycle 推导：
+
+```text
+wip_count = count(task.lifecycle in {scheduled, in_progress, reported})
+```
+
+`backlog`、`verified`、`cancelled` 和 `superseded` 不计入 WIP。`reported` 仍占容量，因为 worker 已交付但 Lead 尚未完成 verification；只有推进到 `verified`、`cancelled`、`superseded` 或退回 `backlog` 后才释放容量。
+
+`capture` 不会自动填充 WIP。WIP 4 只约束 owner 明确排期、`steady` 或 `accelerate` 下的调度；调度前重新计算当前 WIP，达到上限时保留 Task 在 backlog，并说明占用容量的 hot tasks。用户或项目可以声明其它有效 WIP，但 Lead 必须把 effective limit 和作用范围记录在 `state.md`，不能静默覆盖。
 
 ## Execution modes
 
@@ -137,14 +155,14 @@ runnable(task) =
 - `lead`：维护唯一 context 和 backlog，拆分 Task，判断 readiness，选择执行目标，监督、验收、集成和压缩历史。
 - `execution target`：可以是新 session、已有 session、subagent 或等价 worker；只修改 Task contract 允许的范围，返回 receipt，不直接写共享 context。
 
-派发 packet 必须包含 Task 的 objective、scope、workspace、依赖、acceptance、verification、授权边界、停止条件和 receipt 指针。Lead 在 receipt 返回后重新读取 live authority，并决定 `reported` 是否可以推进到 `verified`。
+派发 packet 必须包含 Task 的 objective、scope、workspace、依赖、acceptance、verification contract、授权边界、停止条件和 receipt 指针。Verification contract 至少包含 `verification_depth`（默认为 `targeted`）、逐项 claim 的 required evidence 和 producer-consumer integration gates。Lead 在 receipt 返回后重新读取 live authority，并按证据协议决定 `reported` 是否可以推进到 `verified`。
 
 ## Verified compaction
 
 当 Task 进入 `verified`：
 
 1. 把稳定结论提升到 `context.md`、`decisions.md` 或项目权威 artifact；
-2. 在 `history.md` 追加紧凑记录，包含 Task 或 milestone、outcome、delivery、verification、`closed_at` 和唯一 evidence/recovery pointer。相邻、同 owner、没有独立恢复价值的微任务可以合并为一个 milestone，但保留包含的 Task IDs 和所有仍有价值的指针；
+2. 在 `history.md` 追加紧凑记录，包含 Task 或 milestone、outcome、delivery、verification depth、`closed_at` 和唯一 evidence/recovery pointer。相邻、同 owner、没有独立恢复价值的微任务可以合并为一个 milestone，但保留包含的 Task IDs 和所有仍有价值的指针；
 3. 从 `state.md` 的 active/hot tasks 移除；
 4. 删除或移出详细 Task/receipt 热区。若 receipt 含有不能由 history 或权威 artifact 重建的证据或恢复信息，将它移到明确的历史路径并由 history 指向，而不是保留两份 current truth；
 5. 重新评估依赖图和剩余 backlog，不因 compaction 关闭 workstream。
