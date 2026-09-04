@@ -108,3 +108,5 @@ npm test
 ## Versioning
 
 Claude Code and Codex plugin versions live in `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json`. Keep the two versions equal and bump both whenever installed plugin content should update. Marketplace entries and individual skills intentionally do not duplicate the plugin version.
+
+See [CHANGELOG.md](CHANGELOG.md) for user-visible changes and migration notes.
