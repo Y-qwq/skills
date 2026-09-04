@@ -5,16 +5,36 @@
   lifecycle: reported
   verification_depth: receipt-only
   acceptance: [A1]
-  required_evidence: ["diff at commit docs-17 in the local workspace"]
+  required_evidence:
+    - kind: git-diff
+      subject: documentation artifact matches the contract
+      required_environment: local workspace
+      command_or_source: "git diff --check"
+      freshness_or_ref_requirement: current task artifact ref
 - id: R-02
   lifecycle: reported
   verification_depth: targeted
   acceptance: [A2, A3]
   required_evidence:
-    - "producer schema contract at api-42"
-    - "consumer generated client at web-88"
+    - kind: schema
+      subject: producer API contract
+      required_environment: CI or contract workspace
+      command_or_source: schema check report
+      freshness_or_ref_requirement: current producer contract version
+    - kind: generated-artifact
+      subject: consumer generated client
+      required_environment: consumer workspace
+      command_or_source: typecheck report
+      freshness_or_ref_requirement: generated from the current producer contract
   integration_gates:
-    - "producer api-42 is compatible with consumer web-88"
+    - id: producer-consumer-compatible
+      between: producer API -> consumer client
+      required_evidence:
+        - kind: integration-check
+          subject: producer and consumer compatibility
+          required_environment: integration workspace
+          command_or_source: contract compatibility check
+          freshness_or_ref_requirement: same current producer and consumer versions
 - id: B-01
   lifecycle: backlog
   readiness: ready

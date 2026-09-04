@@ -49,10 +49,10 @@ pre_ready_policy: explicit_only
 
 # Execution defaults and policies
 
-- Default execution mode: `capture`
-- Default WIP limit: `4`
-- Default verification depth: `targeted`
-- Pre-ready policy: `explicit_only`
+- Default execution mode: `{{default_execution_mode}}`
+- Default WIP limit: {{default_wip_limit}}
+- Default verification depth: `{{default_verification_depth}}`
+- Pre-ready policy: `{{pre_ready_policy}}`
 - Context owner: {{context_owner}}
 - Active context root: {{active_context_root}}
 - Active branch or ref: {{active_branch_or_ref}}

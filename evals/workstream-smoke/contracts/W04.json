@@ -15,34 +15,6 @@
     "blocked-ready-not-runnable",
     "mode-does-not-relax-constraints"
   ],
-  "verification": {
-    "default_depth": "targeted",
-    "depths": ["receipt-only", "targeted", "independent"],
-    "receipt_fields": [
-      "claim",
-      "acceptance_refs",
-      "evidence_kind",
-      "ref_or_version",
-      "environment",
-      "command_or_source",
-      "result",
-      "observed_at",
-      "limitations_or_unverified_gaps",
-      "recovery_pointer"
-    ],
-    "lead_checks": ["evidence-binding", "acceptance-coverage", "integration-coverage"],
-    "escalation_triggers": [
-      "evidence-missing",
-      "evidence-stale",
-      "evidence-contradictory",
-      "acceptance-or-integration-gap",
-      "live-state-drift",
-      "flaky-signal",
-      "high-risk-or-irreversible",
-      "worker-unverified-gap",
-      "owner-requests-independent"
-    ]
-  },
   "must_observe": [
     "Uses the project-declared canonical owner and active context root rather than inventing a second root under the harness boundary",
     "Captures A, B, C and D as durable backlog work items with readiness separate from lifecycle",

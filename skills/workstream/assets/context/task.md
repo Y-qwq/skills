@@ -19,13 +19,19 @@ verification:
         - "{{acceptance_id}}"
       required_evidence:
         - kind: "{{evidence_kind}}"
-          ref_or_version: "{{exact_ref_or_version}}"
-          environment: "{{environment}}"
+          subject: "{{evidence_subject}}"
+          required_environment: "{{required_environment}}"
           command_or_source: "{{command_or_source}}"
+          freshness_or_ref_requirement: "{{freshness_or_ref_requirement}}"
   integration_gates:
     - id: "{{integration_gate_id}}"
       between: "{{producer_and_consumer}}"
-      required_evidence: "{{integration_evidence}}"
+      required_evidence:
+        - kind: "{{integration_evidence_kind}}"
+          subject: "{{integration_evidence_subject}}"
+          required_environment: "{{integration_required_environment}}"
+          command_or_source: "{{integration_command_or_source}}"
+          freshness_or_ref_requirement: "{{integration_freshness_or_ref_requirement}}"
 created_at: "{{created_at}}"
 updated_at: "{{updated_at}}"
 ---
@@ -86,8 +92,9 @@ updated_at: "{{updated_at}}"
 ## Verification contract
 
 - Depth: `{{verification_depth}}` (`receipt-only` | `targeted` | `independent`)
-- Claims must map to acceptance refs and required evidence.
-- Integration gates must identify producer, consumer, expected version or contract, and the evidence that proves compatibility.
+- Required evidence is an execution-time specification: define its kind, subject, required environment, command or source, and freshness/ref requirement; do not invent an actual ref/version before execution.
+- Claims must map to acceptance refs and required evidence specifications.
+- Integration gates must identify producer, consumer, expected version or contract, and the evidence specification that will prove compatibility.
 
 # Context pointers
 
@@ -95,4 +102,4 @@ updated_at: "{{updated_at}}"
 
 # Expected receipt
 
-Return outcome, actual changes, worker validation, claim-evidence mapping, exact refs/versions/environments, commands or sources, results, observed_at, limitations/unverified gaps, deviations, open issues, and recovery information. The receipt reports `reported`; Lead verification decides whether the Task can become `verified`.
+Return outcome, actual changes, worker validation, claim-to-acceptance mapping, actual evidence with exact refs/versions/environments, commands or sources, results, observed_at, limitations/unverified gaps, deviations, open issues, and recovery information. Required evidence comes from this Task contract; observed evidence is recorded only after execution. The receipt reports `reported`; Lead verification decides whether the Task can become `verified`.

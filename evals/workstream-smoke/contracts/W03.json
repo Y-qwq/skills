@@ -11,34 +11,6 @@
     "verified-compaction",
     "explicit-workstream-closure"
   ],
-  "verification": {
-    "default_depth": "targeted",
-    "depths": ["receipt-only", "targeted", "independent"],
-    "receipt_fields": [
-      "claim",
-      "acceptance_refs",
-      "evidence_kind",
-      "ref_or_version",
-      "environment",
-      "command_or_source",
-      "result",
-      "observed_at",
-      "limitations_or_unverified_gaps",
-      "recovery_pointer"
-    ],
-    "lead_checks": ["evidence-binding", "acceptance-coverage", "integration-coverage"],
-    "escalation_triggers": [
-      "evidence-missing",
-      "evidence-stale",
-      "evidence-contradictory",
-      "acceptance-or-integration-gap",
-      "live-state-drift",
-      "flaky-signal",
-      "high-risk-or-irreversible",
-      "worker-unverified-gap",
-      "owner-requests-independent"
-    ]
-  },
   "must_observe": [
     "Proceeds without an extra blanket confirmation because the action is within user scope and allowed by the harness and repository",
     "Records the observed old remote SHA, intended new SHA, target ref, reason, affected pull request, and an actually retained recovery source",

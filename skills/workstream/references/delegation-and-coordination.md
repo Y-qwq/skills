@@ -65,16 +65,22 @@ verification:
       acceptance_refs: [A1]
       required_evidence:
         - kind: git-diff
-          ref_or_version: "<exact commit, schema, artifact, or external version>"
-          environment: "<observed environment>"
-          command_or_source: "<command, report, or source locator>"
+          subject: "<artifact or state that must be observed>"
+          required_environment: "<environment in which the evidence must be observed>"
+          command_or_source: "<command, report, or source locator to use>"
+          freshness_or_ref_requirement: "<how current or exact the observed ref/version must be>"
   integration_gates:
     - id: producer-consumer-compatible
       between: "<producer> -> <consumer>"
-      required_evidence: "<cross-boundary check and expected result>"
+      required_evidence:
+        - kind: integration-check
+          subject: "<cross-boundary compatibility>"
+          required_environment: "<environment>"
+          command_or_source: "<check or source locator>"
+          freshness_or_ref_requirement: "<current producer and consumer versions>"
 ```
 
-`verification_depth` 默认为 `targeted`，但 owner、Task 风险或当前 contract 可以选择其它等级。`claims` 必须覆盖 acceptance；`required_evidence` 必须要求可追溯的类型、精确 ref/version、environment 及 command/source。跨 Task 的 producer-consumer 关系写入 `integration_gates`，不能只依赖两个 worker 各自声称局部通过。
+`verification_depth` 默认为 `targeted`，但 owner、Task 风险或当前 contract 可以选择其它等级。`claims` 必须覆盖 acceptance；Task contract 中的 `required_evidence` 是执行前的证据规格，不是尚未存在的 actual ref/version，至少定义 kind、subject、required_environment、command_or_source 和 freshness_or_ref_requirement。Worker 执行后才在 receipt 中填入 observed evidence 的 actual ref/version、environment、result 和 observed_at。跨 Task 的 producer-consumer 关系写入 `integration_gates`，不能只依赖两个 worker 各自声称局部通过。
 
 ### Worker validation
 
@@ -104,7 +110,7 @@ Lead verification 是 evidence-first、incremental 的验收，不是默认重�
 | `targeted` | 先完成上述审计，再补最关键的一个或少量 acceptance/integration 检查 | 默认等级；普通实现、文档或契约变更 |
 | `independent` | 独立复现核心结论和关键边界，并记录独立观察 | 权限、安全、隐私、迁移、发布、资损、高风险架构或不可逆影响 |
 
-Lead 可以因风险升级 verification depth，但必须在 Task/receipt 中记录升级后的等级和理由；不得静默降级。如果声明的等级无法执行，应保持 `reported` 或将 Task 标为受阻并报告缺口，而不是假装完成。
+Lead 可以因风险升级 verification depth，但必须在 receipt 的 `effective_verification_depth`、`lead_verification.escalation_trigger` 和 `lead_verification.additional_checks` 中记录升级后的等级、理由和增加的检查；不得静默降级。如果声明的等级无法执行，应保持 `reported` 或将 Task 标为受阻并报告缺口，而不是假装完成。
 
 只有出现以下信号时才扩大到超出声明深度的调查或验证：
 

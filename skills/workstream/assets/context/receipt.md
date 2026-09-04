@@ -4,8 +4,12 @@ workstream_id: "{{workstream_id}}"
 result: "{{result}}"
 execution_target: "{{execution_target}}"
 reported_at: "{{reported_at}}"
-verification_depth: targeted
-lead_verification: pending
+requested_verification_depth: "{{requested_verification_depth}}"
+effective_verification_depth: "{{effective_verification_depth}}"
+lead_verification:
+  status: pending
+  escalation_trigger: null
+  additional_checks: []
 ---
 
 # Outcome
@@ -24,7 +28,7 @@ Worker validation records observations from the Task-owned scope. It is not Lead
 
 # Claim-evidence mapping
 
-Map every claim to the acceptance item it supports and to evidence that can be independently traced:
+Map every claim to the acceptance item it supports and to evidence observed after execution. The Task contract's required evidence is a specification; this table records actual evidence:
 
 | Claim | Acceptance refs | Evidence kind | Exact ref/version | Environment | Command or source | Result | Observed at | Limitations or unverified gaps | Recovery pointer |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -48,8 +52,11 @@ Map every claim to the acceptance item it supports and to evidence that can be i
 
 - Lifecycle reported by this receipt: `reported`; lead must verify before marking the Task `verified`.
 - Readiness at execution: `{{readiness}}`
-- Verification depth requested by the Task: `{{verification_depth}}` (default: `targeted`)
-- Lead verification status: `pending`; record any escalation trigger and additional check before changing it.
+- Requested verification depth from the Task: `{{requested_verification_depth}}` (default: `targeted`)
+- Effective verification depth applied by Lead: `{{effective_verification_depth}}`; record an escalation before changing it.
+- Lead verification status: `pending`; record status, escalation trigger and additional checks in `lead_verification` before changing it.
+- Escalation trigger: `{{escalation_trigger}}`
+- Additional checks: `{{additional_checks}}`
 
 # Limitations and unverified gaps
 

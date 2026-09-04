@@ -16,6 +16,13 @@
   "verification": {
     "default_depth": "targeted",
     "depths": ["receipt-only", "targeted", "independent"],
+    "required_evidence_spec_fields": [
+      "kind",
+      "subject",
+      "required_environment",
+      "command_or_source",
+      "freshness_or_ref_requirement"
+    ],
     "receipt_fields": [
       "claim",
       "acceptance_refs",
@@ -51,6 +58,7 @@
     "Reads the default capture mode, default WIP limit four, and targeted verification depth from the context",
     "Calculates initial WIP as four from scheduled, in_progress, and reported tasks and excludes backlog tasks",
     "Leaves scheduling unchanged during Turn 1 despite available backlog candidates",
+    "Keeps Task required_evidence as a pre-execution specification and records actual refs, environments, results, and observed_at only in the receipts",
     "Uses the complete receipt evidence for R-01 without repeating its local validation",
     "Uses a targeted integration check for R-02 because the producer-consumer gate is missing, without rerunning all local worker checks",
     "After verified work releases capacity, applies the effective WIP limit and runnable predicate before scheduling B-01",
@@ -61,6 +69,7 @@
   "must_not_observe": [
     "Counts backlog, verified, cancelled, or superseded tasks toward WIP",
     "Automatically schedules a task in capture mode",
+    "Invents actual ref or version values in a Task required_evidence specification before execution",
     "Treats a worker completion claim or passed result without traceable evidence as Lead verification",
     "Repeats the complete worker investigation or validation when the receipt evidence is current and acceptance-complete",
     "Uses two local success claims as a substitute for the R-02 integration gate",
