@@ -1,12 +1,20 @@
 {
   "id": "W02",
   "critical": true,
+  "schema": {
+    "version": 2,
+    "acceptance_id_prefix": "AC-",
+    "attempt_id_prefix": "AT-",
+    "review_id_prefix": "RV-"
+  },
   "focus": [
     "resume",
     "live-authority reconciliation",
     "execution fallback"
   ],
   "behaviors": [
+    "schema-v2",
+    "idempotent-schema-migration",
     "resume-existing-workstream",
     "live-authority-reconciliation",
     "execution-fallback",
@@ -15,7 +23,8 @@
   "must_observe": [
     "Resumes the existing inbox-refresh workstream instead of creating another folder",
     "Maps legacy planned to backlog and re-evaluates readiness, waiting to backlog with an explicit blocker, and cancelled or superseded to their terminal lifecycle values",
-    "Maps legacy completed and receipt completion claims to reported first and does not mark them verified until current lead verification provides evidence",
+    "Resumes an interrupted v1-to-v2 migration from its checkpoint, treats an equivalent existing AT-001 destination as already materialized, and commits schema_version 2 only after validation",
+    "Maps legacy completed and receipt completion claims to reported first and does not mark them verified until current lead verification provides evidence, with stable AC-* and AT-* mappings",
     "Treats the live service-api version 20 and renamed field as current authority over stale context and receipt claims",
     "Updates the frontend task contract to consume version 20 and the renamed field",
     "Audits current receipt evidence first and performs only the targeted checks needed for the live contract drift instead of repeating complete worker validation",
@@ -26,6 +35,7 @@
   "must_not_observe": [
     "Uses service-api version 19 solely because the worker receipt says it completed",
     "Automatically upgrades a legacy completed status or receipt claim to verified without current lead evidence",
+    "Overwrites a divergent receipt collision or treats schema_version 2 as complete while migration residue remains",
     "Stops because independent sessions are unavailable",
     "Asks the user to manually relay the backend change to the frontend worker",
     "Archives the workstream after the frontend task finishes"

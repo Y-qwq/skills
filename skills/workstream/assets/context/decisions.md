@@ -1,5 +1,7 @@
 # Decisions
 
+Schema version: `2`.
+
 ## {{decision_id}} — {{title}}
 
 - Date: {{decided_at}}

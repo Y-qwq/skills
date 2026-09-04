@@ -1,0 +1,21 @@
+{
+  "migration_state": {
+    "target_version": 2,
+    "status": "in_progress",
+    "schema_version_committed": false
+  },
+  "receipt_move": {
+    "source": "receipts/BE-01.md",
+    "destination": "receipts/BE-01/AT-001.md",
+    "source_exists": true,
+    "destination_exists": true,
+    "comparison": "equivalent"
+  },
+  "resume_policy": {
+    "equivalent_destination": "retain-destination-and-continue",
+    "divergent_destination": "block-without-overwrite",
+    "schema_version_commit_order": "last",
+    "successful_status": "completed",
+    "conflict_status": "blocked"
+  }
+}

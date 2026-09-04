@@ -1,12 +1,19 @@
 {
   "id": "W03",
   "critical": true,
+  "schema": {
+    "version": 2,
+    "acceptance_id_prefix": "AC-",
+    "attempt_id_prefix": "AT-",
+    "review_id_prefix": "RV-"
+  },
   "focus": [
     "authority",
     "recoverability",
     "explicit lifecycle closure"
   ],
   "behaviors": [
+    "schema-v2",
     "guarded-recovery",
     "verified-compaction",
     "explicit-workstream-closure"

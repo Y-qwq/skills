@@ -24,6 +24,8 @@ Harness authority 是能力上限，不单独证明用户希望执行该 action�
 
 状态容易漂移时，在 mutation 前即时刷新，不使用 session 启动时或旧 context 中的快照。
 
+每次有后果的 mutation 都归属于一个 Task attempt，并在 `receipts/<task-id>/<attempt-id>.md` 记录精确 target、observed version、结果和 recovery pointer。失败或 partial 结果仍保留为该 attempt 的 evidence；Lead 再决定 retry、添加 typed blocker、cancel 或 supersede，不能覆盖 receipt 或把失败直接写成 `verified`。
+
 ## History rewriting
 
 不要把 history rewriting 写成绝对禁令。Workstream-owned target 在 scope、harness 和 repository policy 允许，且并发影响与恢复路径明确时可以执行。
@@ -35,7 +37,7 @@ Harness authority 是能力上限，不单独证明用户希望执行该 action�
 3. 记录 intended new SHA、原因和受影响 PR 或 downstream branch；
 4. 优先使用带明确 expected SHA 的 guarded update，例如 `--force-with-lease=<ref>:<observed-sha>`，而不是无条件 force；
 5. guarded update 因 remote drift 失败时，重新读取 remote state 并评估，不自动降级为无条件覆盖；
-6. 成功后回读 remote ref，并将 before、after 与验证写入 receipt。
+6. 成功后回读 remote ref，并将 before、after 与验证写入当前 `AT-*` receipt；若操作失败，记录失败结果、保留恢复指针并由 Lead 决定下一 lifecycle。
 
 对非 Git 系统使用等价的 conditional update、version check 或 compare-and-swap 能力。
 
@@ -49,7 +51,7 @@ Worker 的完成声明、命令成功或局部测试只证明它们实际覆盖�
 - 区分 static、local、CI、runtime、release 与 production evidence；
 - 明确记录未运行、不可用或仍不确定的验证。
 
-跨 repo delivery 需要记录每个交付物的链接或 ref、依赖顺序和最终集成状态。
+跨 repo delivery 需要记录每个交付物的链接或 ref、依赖顺序和最终集成状态。Producer/consumer 的 acceptance 使用 Task contract 中的 `AC-*` IDs 和 integration gates，不能用两个局部成功声明代替集成证据。
 
 ## Report
 

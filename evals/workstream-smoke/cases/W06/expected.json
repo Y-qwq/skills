@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "tasks": [
+    {
+      "id": "T-101",
+      "lifecycle": "verified",
+      "current_attempt_id": "AT-002",
+      "blockers": []
+    },
+    {
+      "id": "T-102",
+      "lifecycle": "backlog",
+      "current_attempt_id": "AT-001",
+      "blockers": [
+        {
+          "ref": "environment:staging-import",
+          "kind": "environment-unavailable",
+          "reason": "target environment lease is unavailable"
+        }
+      ]
+    },
+    {
+      "id": "T-103",
+      "lifecycle": "superseded",
+      "current_attempt_id": "AT-001",
+      "replacement_task": "T-104",
+      "blockers": []
+    }
+  ],
+  "attempts": [
+    {
+      "task_id": "T-101",
+      "attempt_id": "AT-001",
+      "acceptance_refs": ["AC-001"],
+      "lead_outcome": "retry",
+      "effective_depth": "targeted",
+      "decided_at": "2026-09-04T10:10:00+08:00",
+      "verified_at": null,
+      "escalation_trigger": "acceptance-or-integration-gap",
+      "additional_checks": ["confirm the failed fixture-shape assertion"]
+    },
+    {
+      "task_id": "T-101",
+      "attempt_id": "AT-002",
+      "acceptance_refs": ["AC-001"],
+      "lead_outcome": "accepted",
+      "effective_depth": "targeted",
+      "decided_at": "2026-09-04T10:30:00+08:00",
+      "verified_at": "2026-09-04T10:30:00+08:00",
+      "escalation_trigger": null,
+      "additional_checks": ["rerun the normalized-write acceptance check"],
+      "evidence_binding": {
+        "ref_or_version": "import-branch-12",
+        "environment": "local workspace",
+        "result": "passed"
+      },
+      "acceptance_coverage": ["AC-001"],
+      "integration_coverage": [
+        {"gate": "normalized-import-consumer", "ref_or_version": "import-branch-12", "result": "passed"}
+      ]
+    },
+    {
+      "task_id": "T-102",
+      "attempt_id": "AT-001",
+      "acceptance_refs": ["AC-001"],
+      "lead_outcome": "blocked",
+      "effective_depth": "targeted",
+      "decided_at": "2026-09-04T10:12:00+08:00",
+      "verified_at": null,
+      "escalation_trigger": "worker-unverified-gap",
+      "additional_checks": ["confirm the target environment is unavailable"]
+    },
+    {
+      "task_id": "T-103",
+      "attempt_id": "AT-001",
+      "acceptance_refs": ["AC-001"],
+      "lead_outcome": "superseded",
+      "effective_depth": "receipt-only",
+      "decided_at": "2026-09-04T10:15:00+08:00",
+      "verified_at": null,
+      "escalation_trigger": null,
+      "additional_checks": ["confirm replacement Task T-104 exists"]
+    }
+  ],
+  "wip_count": 0,
+  "closeout_sections": ["mode/WIP", "backlog counts", "hot tasks", "this-turn changes", "blockers", "owner attention"],
+  "session_record_created": false
+}

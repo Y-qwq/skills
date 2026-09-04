@@ -1,22 +1,24 @@
 ---
+schema_version: 2
 id: "{{task_id}}"
 workstream_id: "{{workstream_id}}"
 readiness: "{{readiness}}"
 lifecycle: backlog
 priority: normal
-blocked_by: []
-depends_on: []
+dependencies: []
+blockers: []
 owner: "{{task_owner}}"
 lead: "{{lead}}"
 execution_target: null
 one_shot_schedule_request: null
 execution_override: null
 verification_depth: targeted
+current_attempt_id: null
 verification:
   claims:
     - id: "{{claim_id}}"
       acceptance_refs:
-        - "{{acceptance_id}}"
+        - "AC-001"
       required_evidence:
         - kind: "{{evidence_kind}}"
           subject: "{{evidence_subject}}"
@@ -46,10 +48,7 @@ updated_at: "{{updated_at}}"
 
 # Ownership
 
-- Workstream owner: {{workstream_owner}}
-- Lead: {{lead}}
-- Task owner: {{task_owner}}
-- Execution target: null until scheduled
+- Read the Task owner, Lead and current execution target from frontmatter. Read the workstream owner from `context.md`; do not duplicate current ownership values here.
 
 # Scope
 
@@ -65,9 +64,9 @@ updated_at: "{{updated_at}}"
 
 - Inputs: {{inputs}}
 - Consumers: {{consumers}}
-- Blocking tasks: {{blocking_tasks}}
-- `blocked_by`: {{blocked_by}}
-- Dependencies satisfied: {{dependencies_satisfied}}
+- Typed `dependencies` in frontmatter are the canonical prerequisite graph. Each entry names a stable `ref` and the required lifecycle or external condition.
+- Typed `blockers` in frontmatter are the only canonical active blockers. Each entry names a `ref`, `kind`, and `reason`; remove or resolve the entry when the condition clears.
+- Dependencies satisfied and runnable status are derived at scheduling time; do not persist a `runnable` field or duplicate blocker lists in the body.
 
 # Working area
 
@@ -78,12 +77,11 @@ updated_at: "{{updated_at}}"
 
 - Allowed mutations: {{allowed_mutations}}
 - Stop when: {{stopping_condition}}
-- One-shot schedule request: {{one_shot_schedule_request}}
-- Pre-ready execution override: {{execution_override}}
+- One-shot schedule requests and pre-ready execution overrides are read from frontmatter; do not duplicate their current values here.
 
 # Acceptance
 
-- {{acceptance_criterion}}
+- AC-001: {{acceptance_criterion}}
 
 # Verification
 
@@ -91,15 +89,20 @@ updated_at: "{{updated_at}}"
 
 ## Verification contract
 
-- Depth: `{{verification_depth}}` (`receipt-only` | `targeted` | `independent`)
+- Read the requested depth from frontmatter `verification_depth` (`receipt-only` | `targeted` | `independent`).
 - Required evidence is an execution-time specification: define its kind, subject, required environment, command or source, and freshness/ref requirement; do not invent an actual ref/version before execution.
-- Claims must map to acceptance refs and required evidence specifications.
+- Claims must map to stable `AC-*` acceptance refs and required evidence specifications.
 - Integration gates must identify producer, consumer, expected version or contract, and the evidence specification that will prove compatibility.
 
 # Context pointers
 
 - {{context_pointer}}
 
+# Attempts
+
+- Read `current_attempt_id` from frontmatter. It points to the attempt whose evidence currently supports the Task's lifecycle decision; a retry gets a new `AT-001`, `AT-002`, ... ID and updates the pointer without replacing the earlier record.
+- Worker-observed evidence is sealed after the Lead records the Task as `reported`. The Lead may then update only `lead_verification`; after a non-pending decision the attempt record is finalized. It never changes Task lifecycle on its own.
+
 # Expected receipt
 
-Return outcome, actual changes, worker validation, claim-to-acceptance mapping, actual evidence with exact refs/versions/environments, commands or sources, results, observed_at, limitations/unverified gaps, deviations, open issues, and recovery information. Required evidence comes from this Task contract; observed evidence is recorded only after execution. The receipt reports `reported`; Lead verification decides whether the Task can become `verified`.
+Return a structured payload containing outcome, actual changes, worker validation, claim-to-acceptance mapping, actual evidence with exact refs/versions/environments, commands or sources, results, observed_at, limitations/unverified gaps, deviations, open issues, and recovery information. The Lead writes it to `receipts/{{task_id}}/<attempt-id>.md`. Required evidence comes from this Task contract; observed evidence is recorded only after execution. The receipt reports `reported`; Lead verification decides whether the Task becomes `verified`, returns to `backlog` for retry or a blocker, or reaches `cancelled`/`superseded`.

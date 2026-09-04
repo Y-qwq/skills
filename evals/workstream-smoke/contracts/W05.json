@@ -1,18 +1,41 @@
 {
   "id": "W05",
   "critical": true,
+  "schema": {
+    "version": 2,
+    "acceptance_id_prefix": "AC-",
+    "attempt_id_prefix": "AT-",
+    "review_id_prefix": "RV-"
+  },
   "focus": [
     "evidence-first incremental verification",
     "WIP accounting",
     "verification depth and escalation"
   ],
   "behaviors": [
+    "schema-v2",
+    "stable-acceptance-ids",
+    "attempt-receipts",
     "default-wip-limit",
     "wip-lifecycle-calculation",
     "evidence-first-verification",
     "verification-depths",
     "verification-escalation"
   ],
+  "attempts": {
+    "receipt_path": "receipts/<task-id>/<attempt-id>.md",
+    "attempt_id_pattern": "^AT-[0-9]{3}$",
+    "acceptance_ref_pattern": "^AC-[0-9]{3}$",
+    "lead_outcomes": ["pending", "accepted", "retry", "blocked", "cancelled", "superseded"],
+    "required_lead_fields": [
+      "outcome",
+      "effective_depth",
+      "decided_at",
+      "verified_at",
+      "escalation_trigger",
+      "additional_checks"
+    ]
+  },
   "verification": {
     "default_depth": "targeted",
     "depths": ["receipt-only", "targeted", "independent"],
@@ -36,9 +59,10 @@
       "recovery_pointer"
     ],
     "lead_verification_fields": [
-      "requested_verification_depth",
-      "effective_verification_depth",
-      "status",
+      "outcome",
+      "effective_depth",
+      "decided_at",
+      "verified_at",
       "escalation_trigger",
       "additional_checks"
     ],

@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "tasks": [
+    {"id": "T-201", "lifecycle": "verified", "blockers": []},
+    {"id": "T-202", "lifecycle": "backlog", "blockers": [{"ref": "review:RV-003", "kind": "owner-decision", "reason": "owner must choose the release policy"}]},
+    {"id": "T-203", "lifecycle": "in_progress", "blockers": []}
+  ],
+  "active_reviews": [
+    {"id": "RV-002", "intent": "advise", "status": "presented"},
+    {"id": "RV-003", "intent": "decide", "status": "queued"}
+  ],
+  "review_history": [
+    {"id": "RV-001", "intent": "inspect", "terminal_status": "resolved", "presentation": "inline-full", "artifact_ref": "artifact:message-summary"}
+  ],
+  "owner_attention_projection": [
+    {"id": "RV-002", "derived_blocking_tasks": [], "presentation": "compact"},
+    {
+      "id": "RV-003",
+      "derived_blocking_tasks": ["T-202"],
+      "presentation": "indexed",
+      "reading_cost_minutes": 12,
+      "recommendation_order": 1,
+      "owner_selection_supported": true
+    }
+  ],
+  "wip_count": 1,
+  "closeout_sections": ["mode/WIP", "backlog counts", "hot tasks", "this-turn changes", "blockers", "owner attention"],
+  "session_record_created": false
+}

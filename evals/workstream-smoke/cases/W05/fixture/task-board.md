@@ -1,10 +1,11 @@
-# Task verification contracts
+# Task verification contracts (schema_version: 2)
 
 ```yaml
 - id: R-01
   lifecycle: reported
+  current_attempt_id: AT-001
   verification_depth: receipt-only
-  acceptance: [A1]
+  acceptance: [AC-001]
   required_evidence:
     - kind: git-diff
       subject: documentation artifact matches the contract
@@ -13,8 +14,9 @@
       freshness_or_ref_requirement: current task artifact ref
 - id: R-02
   lifecycle: reported
+  current_attempt_id: AT-001
   verification_depth: targeted
-  acceptance: [A2, A3]
+  acceptance: [AC-002, AC-003]
   required_evidence:
     - kind: schema
       subject: producer API contract
@@ -38,11 +40,15 @@
 - id: B-01
   lifecycle: backlog
   readiness: ready
-  acceptance: [A4]
+  dependencies: []
+  blockers: []
+  acceptance: [AC-004]
 - id: SEC-01
   lifecycle: backlog
   readiness: ready
+  dependencies: []
+  blockers: []
   verification_depth: independent
-  acceptance: [A5]
+  acceptance: [AC-005]
   risk: high
 ```

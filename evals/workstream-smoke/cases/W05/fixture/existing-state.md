@@ -1,6 +1,7 @@
 # Existing state
 
 ```yaml
+schema_version: 2
 execution_mode: capture
 wip_limit: 4
 hot_tasks:

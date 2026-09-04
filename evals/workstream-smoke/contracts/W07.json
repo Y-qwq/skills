@@ -1,0 +1,75 @@
+{
+  "id": "W07",
+  "critical": true,
+  "schema": {
+    "version": 2,
+    "acceptance_id_prefix": "AC-",
+    "attempt_id_prefix": "AT-",
+    "review_id_prefix": "RV-"
+  },
+  "focus": [
+    "owner attention queue",
+    "non-blocking autonomy",
+    "Lead closeout projection"
+  ],
+  "behaviors": [
+    "schema-v2",
+    "owner-attention-queue",
+    "review-nonblocking-default",
+    "explicit-review-blocker",
+    "blocking-scope-derived",
+    "review-compaction",
+    "lead-closeout-view",
+    "review-content-sizing",
+    "no-persisted-session-status"
+  ],
+  "review": {
+    "id_pattern": "^RV-[0-9]{3}$",
+    "intents": ["inspect", "advise", "decide"],
+    "statuses": ["queued", "presented", "resolved", "waived", "superseded"],
+    "blocker_eligible_intent": "decide",
+    "blocker_eligible_statuses": ["queued", "presented"],
+    "canonical_blocking_source": "task.blockers[].ref",
+    "wip_counted": false
+  },
+  "closeout": {
+    "required_sections": [
+      "mode/WIP",
+      "backlog counts",
+      "hot tasks",
+      "this-turn changes",
+      "blockers",
+      "owner attention"
+    ],
+    "large_content_behavior": "index-reading-costs-recommendation-order-owner-selection"
+  },
+  "must_observe": [
+    "Creates or maintains RV-* owner attention records with inspect, advise, and decide intents and valid statuses",
+    "Shows small queued RV-001 inspect content inline and can resolve it after complete presentation without owner acknowledgement",
+    "Keeps presented non-blocking RV-002 compact and allows unrelated Lead work under its reversible assumption",
+    "Highlights RV-003 as a blocking decide item only because Task T-202 explicitly lists ref review:RV-003 in blockers[]",
+    "Rejects inspect or advise review references as Task blockers unless the review is first promoted to an active decide item with a recorded reason",
+    "Derives review blocking scope by reverse-indexing Task blockers rather than maintaining a review-owned blocks field",
+    "Does not block T-201 verification or T-203 progress because a review is merely queued or presented",
+    "For large queued content, shows an index, reading costs, and recommended order and lets the owner choose which item to explain",
+    "Outputs mode/WIP, readiness backlog counts, hot tasks, this-turn changes, Task blockers, and owner attention after the work cycle",
+    "Does not persist session status or count reviews toward WIP",
+    "Compacts resolved/waived/superseded reviews into stable decision/history pointers while preserving unresolved reviews across Task compaction"
+  ],
+  "must_not_observe": [
+    "Treats every review as an approval gate or blocks unrelated work until the owner reads it",
+    "Uses review related_tasks or a review-owned blocks field as the canonical blocker relation",
+    "Lets an inspect, advise, resolved, waived, or superseded review block a Task",
+    "Counts queued or presented reviews toward the WIP limit",
+    "Deletes RV-003 merely because a related Task becomes verified",
+    "Creates a persisted session Task or lifecycle just to represent the closeout",
+    "Hides large review content without an index, reading cost, or owner selection path"
+  ],
+  "evidence": [
+    "Task blocker records",
+    "review records and statuses",
+    "derived state projection",
+    "Lead closeout",
+    "compaction pointers"
+  ]
+}
