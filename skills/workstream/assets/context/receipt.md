@@ -5,7 +5,7 @@ result: "{{result}}"
 execution_target: "{{execution_target}}"
 reported_at: "{{reported_at}}"
 requested_verification_depth: "{{requested_verification_depth}}"
-effective_verification_depth: "{{effective_verification_depth}}"
+effective_verification_depth: null
 lead_verification:
   status: pending
   escalation_trigger: null
@@ -53,7 +53,7 @@ Map every claim to the acceptance item it supports and to evidence observed afte
 - Lifecycle reported by this receipt: `reported`; lead must verify before marking the Task `verified`.
 - Readiness at execution: `{{readiness}}`
 - Requested verification depth from the Task: `{{requested_verification_depth}}` (default: `targeted`)
-- Effective verification depth applied by Lead: `{{effective_verification_depth}}`; record an escalation before changing it.
+- Effective verification depth applied by Lead: `{{effective_verification_depth}}`; it remains `null` until Lead performs verification, and any escalation must be recorded before changing it.
 - Lead verification status: `pending`; record status, escalation trigger and additional checks in `lead_verification` before changing it.
 - Escalation trigger: `{{escalation_trigger}}`
 - Additional checks: `{{additional_checks}}`

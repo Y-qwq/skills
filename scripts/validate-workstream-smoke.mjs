@@ -95,6 +95,13 @@ const requiredObservedEvidenceFields = [
   "limitations_or_unverified_gaps",
   "recovery_pointer",
 ];
+const requiredLeadVerificationFields = [
+  "requested_verification_depth",
+  "effective_verification_depth",
+  "status",
+  "escalation_trigger",
+  "additional_checks",
+];
 const verificationBehaviors = new Set([
   "evidence-first-verification",
   "verification-depths",
@@ -197,6 +204,7 @@ for (const entry of manifest.cases ?? []) {
       for (const [field, requiredValues] of [
         ["required_evidence_spec_fields", requiredEvidenceSpecFields],
         ["receipt_fields", requiredObservedEvidenceFields],
+        ["lead_verification_fields", requiredLeadVerificationFields],
         ["lead_checks", requiredLeadChecks],
         ["escalation_triggers", requiredEscalationTriggers],
       ]) {

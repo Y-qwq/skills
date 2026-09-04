@@ -60,7 +60,7 @@ Task 的完成事件通常只会把 lifecycle 推进到 `reported`。`verified` 
 
 Receipt 使用独立的 `result` 记录执行观察，例如 `succeeded`、`partial`、`failed` 或 `blocked`；它不替代 Task 的 lifecycle，也不自动授予 `verified`。Receipt 中的 worker validation 与 Lead verification 是两个不同判断：前者说明 worker 在自己的边界内观察到了什么，后者决定 evidence 是否足以覆盖 acceptance 与 integration。
 
-Task 的 `verification_depth` 是执行前声明的 requested depth。Receipt 还要记录 `requested_verification_depth` 和 Lead 实际采用的 `effective_verification_depth`；Lead 因风险升级时保留原 requested 值，在 `lead_verification` 中记录状态、`escalation_trigger` 和 `additional_checks`。`history.md` 只记录 effective depth，避免把尚未完成 Lead 判断的声明当成最终事实。
+Task 的 `verification_depth` 是执行前声明的 requested depth。Receipt 还要记录 `requested_verification_depth`，并将 `effective_verification_depth` 初始设为 `null`；只有 Lead 实际执行验证后才能填入 effective depth。Lead 因风险升级时保留原 requested 值，在 `lead_verification` 中记录状态、`escalation_trigger` 和 `additional_checks`。`history.md` 只记录 effective depth，避免把尚未完成 Lead 判断的声明当成最终事实。
 
 ## Capture and materialize
 

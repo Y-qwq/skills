@@ -3,7 +3,12 @@
 ```yaml
 task_id: SEC-01
 result: succeeded
-verification_depth: independent
+requested_verification_depth: independent
+effective_verification_depth: null
+lead_verification:
+  status: pending
+  escalation_trigger: null
+  additional_checks: []
 claims:
   - claim: permission-migration-safe
     acceptance_refs: [A5]

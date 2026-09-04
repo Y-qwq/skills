@@ -3,7 +3,12 @@
 ```yaml
 task_id: R-01
 result: succeeded
-verification_depth: receipt-only
+requested_verification_depth: receipt-only
+effective_verification_depth: null
+lead_verification:
+  status: pending
+  escalation_trigger: null
+  additional_checks: []
 claims:
   - claim: docs-match-contract
     acceptance_refs: [A1]

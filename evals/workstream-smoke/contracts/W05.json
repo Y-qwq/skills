@@ -35,6 +35,13 @@
       "limitations_or_unverified_gaps",
       "recovery_pointer"
     ],
+    "lead_verification_fields": [
+      "requested_verification_depth",
+      "effective_verification_depth",
+      "status",
+      "escalation_trigger",
+      "additional_checks"
+    ],
     "lead_checks": ["evidence-binding", "acceptance-coverage", "integration-coverage"],
     "escalation_triggers": [
       "evidence-missing",
@@ -58,7 +65,7 @@
     "Reads the default capture mode, default WIP limit four, and targeted verification depth from the context",
     "Calculates initial WIP as four from scheduled, in_progress, and reported tasks and excludes backlog tasks",
     "Leaves scheduling unchanged during Turn 1 despite available backlog candidates",
-    "Keeps Task required_evidence as a pre-execution specification and records actual refs, environments, results, and observed_at only in the receipts",
+    "Keeps Task required_evidence as a pre-execution specification, records actual refs, environments, results, and observed_at only in receipts, and leaves effective verification depth null until Lead verification",
     "Uses the complete receipt evidence for R-01 without repeating its local validation",
     "Uses a targeted integration check for R-02 because the producer-consumer gate is missing, without rerunning all local worker checks",
     "After verified work releases capacity, applies the effective WIP limit and runnable predicate before scheduling B-01",

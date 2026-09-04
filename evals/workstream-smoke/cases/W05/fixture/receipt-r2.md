@@ -3,7 +3,12 @@
 ```yaml
 task_id: R-02
 result: succeeded
-verification_depth: targeted
+requested_verification_depth: targeted
+effective_verification_depth: null
+lead_verification:
+  status: pending
+  escalation_trigger: null
+  additional_checks: []
 claims:
   - claim: producer-schema-updated
     acceptance_refs: [A2]
