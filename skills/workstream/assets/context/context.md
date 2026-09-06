@@ -55,7 +55,7 @@ pre_ready_policy: explicit_only
 - Preserved execution attempt records: `receipts/<task-id>/<attempt-id>.md`, where attempt IDs use `AT-001`, `AT-002`, ...
 - Owner-facing attention records: `reviews/<review-id>.md`, where review IDs use `RV-001`, `RV-002`, ...
 - Workstream acceptance IDs use `WAC-001`, `WAC-002`, ... . Task-local acceptance IDs use `AC-001`, `AC-002`, ... and are identified together with their Task ID; an attempt receipt's `task_id` supplies that Task scope.
-- `state.md` is a rebuildable projection. Task lifecycle, active typed blockers, attempt receipts, and review records are the sources of truth described in the schema references.
+- `state.md` frontmatter owns current execution controls and Run admission; only its body is a rebuildable projection. Preserve controls when rebuilding it.
 
 # Canonical controls and placement
 

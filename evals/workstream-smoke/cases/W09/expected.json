@@ -1,0 +1,6 @@
+[
+  { "status": "paused", "actions": ["report"], "notice": "stop-unavailable" },
+  { "status": "paused", "actions": [] },
+  { "status": "paused", "actions": [] },
+  { "status": "paused", "actions": ["report"] }
+]

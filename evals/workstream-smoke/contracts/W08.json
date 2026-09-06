@@ -1,0 +1,10 @@
+{
+  "id": "W08",
+  "critical": true,
+  "schema": { "version": 2, "acceptance_id_prefix": "AC-", "attempt_id_prefix": "AT-", "review_id_prefix": "RV-" },
+  "focus": ["budget draining", "verified stop", "repeated automatic wakeups"],
+  "behaviors": ["run-admission", "verified-driver-stop", "idle-notice-deduplication", "explicit-run-resume"],
+  "must_observe": ["Stops new dispatch at the drain boundary", "Accepts in-flight results and performs bounded cleanup", "Marks paused only after the supplied host stop confirmation", "Repeated ticks do no new work or notification", "Status query and quota reset do not resume execution", "Explicit authorized resume rechecks admission"],
+  "must_not_observe": ["Treats a pause request as stop confirmation", "Repeats pause advice on every tick", "Spends the user reserve on new work", "Falsely completes the full business goal"],
+  "evidence": ["Fixture-bound per-event action trace", "Run status transitions"]
+}

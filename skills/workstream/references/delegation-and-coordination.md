@@ -2,6 +2,8 @@
 
 只有 execution mode 不为 `capture`，或被点名的 Task 带有 one-shot schedule request，且 Task 满足 [task-lifecycle-and-scheduling.md](task-lifecycle-and-scheduling.md) 的 runnable predicate 时才调度。ready Task 可以长期留在 `backlog`；pre-ready 只有同一请求中的明确 per-task override 才能派发，unready 原 Task 不派发。
 
+持续执行还必须通过 [run-control.md](run-control.md) 的准入检查。Task runnable 不等于本轮预算充足；draining 只收取在途结果和执行必要恢复，不派发后继。Worker packet 包含本 Run 的停止条件与安全 checkpoint 要求。
+
 ## Choose the work boundary
 
 只有当 work item 能清楚回答以下问题时才派发：
@@ -148,7 +150,7 @@ Review records 是 owner-facing attention queue，不是默认 approval gate。�
 - Review 的 `related_tasks`/`context_refs` 只是关联信息，不是 blocker；Review 不维护 canonical `blocks` 字段；
 - Review 无论 status 如何都不计入 WIP；Lead 在 closeout 中从 Task blockers 反向派生每个 Review 的 blocking scope。
 
-每轮 Lead work cycle 结束时，必须派生并展示 closeout：mode/WIP、backlog counts、hot tasks、this-turn changes、Task blockers 和 owner attention。新 queued 内容少时直接展示；内容多时给出索引、reading costs（阅读成本）、推荐顺序并让 owner 点选具体 review 介绍。blocking decide 项突出；presented 的 non-blocking 项压缩为 count/title，不让 optional review 阻塞无关工作。Closeout 是响应视图，不持久化 session status，也不额外创建 Task。
+有实质变化、需要决定或用户查询时输出 closeout；普通推进只报增量，里程碑/完整查询才展开 mode/WIP、backlog counts、hot tasks、this-turn changes、Task blockers 和 owner attention。新 queued 内容少时直接展示，较多时给索引、阅读成本与推荐顺序。已有 presented 项不反复展开；无变化不报告。预算停机只保留一次必要交接，按 Run gate 去重并停止驱动，不持续提醒用户停机。Closeout 不持久化为 session status 或额外 Task。
 
 ## Supervise and integrate
 

@@ -27,7 +27,7 @@ The folders have one responsibility each:
 - `tasks/*.md` is the canonical open Task board. A Task's `lifecycle` is the only current execution truth. Its `dependencies` and active `blockers` are typed frontmatter, and `runnable` is derived rather than stored.
 - `receipts/<task-id>/<attempt-id>.md` preserves one execution attempt. Attempt IDs are `AT-001`, `AT-002`, ...; a retry creates a new file and never overwrites an earlier attempt. Worker evidence is sealed when the Lead records `reported`; only `lead_verification` may then change, and the whole record is finalized after a non-pending decision.
 - `reviews/*.md` is the owner-facing attention queue. Review IDs are `RV-001`, `RV-002`, ...; review status and Task lifecycle are independent.
-- `state.md` is a rebuildable dashboard/projection of Task and review records. It is not a second board and does not persist a Lead work-cycle or session status.
+- `state.md` frontmatter owns execution controls, including Run admission and pause intent; its body is a rebuildable projection, not a second board or a session status. Preserve controls when rebuilding the body.
 - `decisions.md` stores stable choices and supersession; `history.md` stores compacted terminal work and unique evidence/recovery pointers.
 
 ## Root resolution
@@ -60,11 +60,13 @@ Root 下直接存在的 workstream folder 即为 active，不增加 `active/` �
 
 恢复 workstream 时：
 
+涉及持续执行时先按 [run-control.md](run-control.md) 检查 Run gate；未满足恢复条件的自动唤醒到此结束，不进入下面的全量恢复流程。
+
 1. 先读 `context.md` 和 `state.md`，确认 `schema_version`；
 2. 将 `tasks/*.md` 视为 open backlog 的 canonical board，按当前请求加载相关 Task、decision、attempt receipt 和 review；
-3. 读取 `history.md` 以恢复已验证结论和唯一 evidence/recovery pointer；
+3. 仅在相关 Task 需要历史证据或恢复指针时读取 `history.md` 对应条目；
 4. 对即将影响 action 的 branch、PR、issue、文件、接口、测试或部署状态重新查询权威来源；
-5. 由 Task、attempt 和 review records 重建 `state.md` 的 counts、hot tasks、候选项、WIP 和 owner attention；不要把 projection 当成第二份事实；
+5. 只在有变化或用户查询时刷新 `state.md` 正文的 counts、hot tasks、候选项、WIP 和 owner attention；保留 frontmatter 控制，不把 projection 当成第二份事实；
 6. 若 live authority 与 context 冲突，先判断 context 过期、实现漂移还是 scope 已改变，再更新 owner 对应的文件。
 
 所有时间使用带时区的 ISO 8601。记录 observation 时间，避免后续把历史快照误当当前状态。

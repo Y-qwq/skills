@@ -2,6 +2,7 @@ import { cp, lstat, mkdtemp, readFile, readdir, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { validateRunTrace } from "./validate-workstream-run.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const skillRoot = path.join(root, "skills", "workstream");
@@ -158,6 +159,11 @@ const requiredBehaviors = new Set([
   "lead-closeout-view",
   "review-content-sizing",
   "no-persisted-session-status",
+  "run-admission",
+  "verified-driver-stop",
+  "idle-notice-deduplication",
+  "explicit-run-resume",
+  "stop-capability-preflight",
 ]);
 for (const entry of manifest.cases ?? []) {
   const label = `manifest ${entry.id ?? "<missing>"}`;
@@ -172,7 +178,7 @@ for (const entry of manifest.cases ?? []) {
   if (entry.prompt !== expectedPrompt) fail(`${label}: prompt must be ${expectedPrompt}`);
   if (entry.fixtures !== expectedFixtures) fail(`${label}: fixtures must be ${expectedFixtures}`);
   if (entry.contract !== expectedContract) fail(`${label}: contract must be ${expectedContract}`);
-  if (["W06", "W07"].includes(entry.id) && entry.expected !== expectedResult) {
+  if (["W06", "W07", "W08", "W09"].includes(entry.id) && entry.expected !== expectedResult) {
     fail(`${label}: expected result must be ${expectedResult}`);
   }
 
@@ -185,6 +191,15 @@ for (const entry of manifest.cases ?? []) {
   const expectedState = expectedResultPath
     ? await parseJson(expectedResultPath, `${label} expected result`)
     : null;
+
+  if (["W08", "W09"].includes(entry.id) && fixturePath) {
+    const fixture = await parseJson(path.join(fixturePath, "events.json"), `${label} events`);
+    try {
+      for (const error of validateRunTrace(fixture, expectedState)) fail(`${label}: step ${error.index}: ${error.code}`);
+    } catch (error) {
+      fail(`${label}: invalid run trace: ${error.message}`);
+    }
+  }
 
   if (promptPath && (await readFile(promptPath, "utf8")).trim().length === 0) {
     fail(`${label}: prompt is empty`);

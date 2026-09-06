@@ -19,7 +19,7 @@ Corpus contract 使用稳定的 `behaviors` 标识覆盖关键边界；judge 仍
 - 只有 evidence 缺失/过期/矛盾、acceptance 或 integration 缺口、live state 漂移、flaky 信号、高风险/不可逆影响、worker 未验证缺口或 owner 要求独立复核时，才扩大验证；
 - Worker failed/blocked 后，Lead 必须把 Task 明确退回 `backlog` + retry/typed blocker，或设置 `cancelled`/`superseded`；新 attempt 只能创建新 `AT-*` receipt，不能覆盖旧 evidence；
 - Review 是 owner attention queue，不是默认审批 gate；`inspect`/`advise` 不得阻塞，只有 `queued`/`presented` 的 active `decide` 可在 Task `blockers[].ref` 明确引用时阻塞；Review 不计 WIP，blocking scope 从 Task 反向派生；
-- 每轮 Lead closeout 都展示 mode/WIP、backlog counts、hot tasks、this-turn changes、Task blockers 和 owner attention；大量内容用索引/阅读成本/推荐顺序并支持 owner 点选，不持久化 session status；
+- 里程碑/完整查询的 closeout 展示六段看板；普通推进只报变化，无变化自动唤醒不重复输出，停机通知去重；大量内容用索引/阅读成本/推荐顺序，不持久化 session status；
 - execution mode 不会扩大 readiness、权限或共享写入边界；verified Task 被压缩到 history，并保留唯一证据/恢复指针；
 - 项目声明的 context owner/root 优先，跨 repo workstream 仍只有一个 canonical context；
 - 对未执行或无法验证的部分明确标为 unknown、unverified 或 simulated；
@@ -46,3 +46,5 @@ Corpus contract 使用稳定的 `behaviors` 标识覆盖关键边界；judge 仍
 - 让 inspect/advise/terminal review 成为 Task blocker，把可选 review 变成审批 gate，或因 owner 尚未阅读而停止无关工作；
 - 覆盖旧 attempt receipt、把 failed/blocked receipt 直接标成 verified，或用 `verified_at` 记录 retry/blocked/cancelled/superseded decision；
 - 将 closeout/session status 持久化为额外 Task 或 lifecycle，或把 review 数量计入 WIP。
+- Run 已关闭准入却继续派发，暂停未证实却标 paused，或无授权地在额度重置后恢复。
+- 没有停机/额度约束能力仍承诺硬保留额度并启动无人值守 Goal。

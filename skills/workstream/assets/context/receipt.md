@@ -30,11 +30,9 @@ lead_verification:
 
 - {{validation_and_result}}
 
-Worker validation records observations from this attempt's Task-owned scope. It is not Lead verification and does not by itself move the Task beyond `reported`.
-
 # Claim-evidence mapping
 
-Map every claim to a stable `AC-*` acceptance item and to evidence observed after this attempt. The Task contract's required evidence is a specification; this table records actual evidence:
+记录本次真实观察，而不是复制 Task 的预期证据：
 
 | Claim | Acceptance refs | Evidence kind | Exact ref/version | Environment | Command or source | Result | Observed at | Limitations or unverified gaps | Recovery pointer |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -57,21 +55,7 @@ Map every claim to a stable `AC-*` acceptance item and to evidence observed afte
 
 # Task handoff
 
-- The worker returns a structured payload; the Lead creates this canonical attempt record and initially records the Task as `reported`.
-- After that write, the observed evidence and worker result are sealed. The Lead may update only the frontmatter `lead_verification` fields while making the lifecycle decision.
-- Read the worker result, requested/effective depth, outcome and timestamps from frontmatter; do not duplicate their current values in this body.
-- Every non-pending outcome records `decided_at`. `verified_at` is non-null only for `outcome: accepted` when the Task lifecycle is `verified`.
-- After a non-pending Lead decision, the entire attempt record is finalized. A retry creates a different `AT-*` file and never overwrites this one.
-
-Lead decisions have one current Task lifecycle truth:
-
-| Lead outcome | Task lifecycle | Required follow-up |
-| --- | --- | --- |
-| `accepted` | `verified` | Promote stable conclusions and compact when appropriate. |
-| `retry` | `backlog` | Preserve this attempt and create a new `AT-*` receipt on the next execution. |
-| `blocked` | `backlog` | Add an active typed `blockers[]` entry on the Task; do not invent a `blocked` lifecycle. |
-| `cancelled` | `cancelled` | Record owner decision and reason. |
-| `superseded` | `superseded` | Record the replacement Task or decision pointer. |
+Worker 返回 payload，Lead 写入后封存观察，只回写 frontmatter 的 `lead_verification`；非 pending 决定后整份记录封存，重试另建 AT。Task lifecycle 只写在 Task 中，转换与时间戳规则遵循 skill 的 Lead verification 协议，不在每份 receipt 重复维护。
 
 # Limitations and unverified gaps
 

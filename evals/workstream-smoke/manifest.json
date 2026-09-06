@@ -44,6 +44,20 @@
       "fixtures": "cases/W07/fixture",
       "contract": "contracts/W07.json",
       "expected": "cases/W07/expected.json"
+    },
+    {
+      "id": "W08",
+      "prompt": "cases/W08/prompt.md",
+      "fixtures": "cases/W08/fixture",
+      "contract": "contracts/W08.json",
+      "expected": "cases/W08/expected.json"
+    },
+    {
+      "id": "W09",
+      "prompt": "cases/W09/prompt.md",
+      "fixtures": "cases/W09/fixture",
+      "contract": "contracts/W09.json",
+      "expected": "cases/W09/expected.json"
     }
   ]
 }

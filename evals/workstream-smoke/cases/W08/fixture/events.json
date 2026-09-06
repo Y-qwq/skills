@@ -1,0 +1,19 @@
+{
+  "initial": { "status": "running", "driver_active": true },
+  "policy": { "reserve_percent": 3, "drain_margin_percent": 1, "hard_reserve": true },
+  "capabilities": { "stop_available": true, "reserve_enforced": true },
+  "events": [
+    { "type": "quota", "remaining_percent": 4, "quota_fresh": true },
+    { "type": "worker_result", "cleanup_needed": true },
+    { "type": "stopped", "stop_confirmed": true },
+    { "type": "tick" },
+    { "type": "tick" },
+    { "type": "tick" },
+    { "type": "tick" },
+    { "type": "tick" },
+    { "type": "tick" },
+    { "type": "status" },
+    { "type": "quota", "remaining_percent": 90, "quota_fresh": true },
+    { "type": "resume", "authorized": true, "remaining_percent": 90, "quota_fresh": true }
+  ]
+}

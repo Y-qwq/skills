@@ -1,0 +1,14 @@
+[
+  { "status": "draining", "actions": ["checkpoint", "wait"], "notice": "budget" },
+  { "status": "draining", "actions": ["cleanup", "checkpoint", "request_stop"] },
+  { "status": "paused", "actions": [] },
+  { "status": "paused", "actions": [] },
+  { "status": "paused", "actions": [] },
+  { "status": "paused", "actions": [] },
+  { "status": "paused", "actions": [] },
+  { "status": "paused", "actions": [] },
+  { "status": "paused", "actions": [] },
+  { "status": "paused", "actions": ["report"] },
+  { "status": "paused", "actions": [] },
+  { "status": "running", "actions": ["start_driver", "dispatch"] }
+]
