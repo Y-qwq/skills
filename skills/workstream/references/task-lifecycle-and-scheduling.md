@@ -116,7 +116,7 @@ blockers:
 
 ## Capture and materialize
 
-默认每次用户对话先更新 backlog，不立即执行。只有以下工作才 materialize 成独立 Task：
+收到新需求时先更新 backlog，不立即执行。状态查询、worker 回报和自动唤醒不重新创建或塑形同一个目标。只有以下工作才 materialize 成独立 Task：
 
 - 有独立 owner 或 execution target；
 - 有依赖、阻塞、顺序或并发控制需求；
@@ -127,7 +127,7 @@ blockers:
 
 ## State projection and WIP
 
-`tasks/*.md` 是 open backlog 的 canonical board；它们可以持续积累 `unready`、`pre-ready` 和 `ready` Task。`state.md` 只保留 readiness/lifecycle 聚合 counts、`scheduled`/`in_progress`/`reported` hot tasks、下一批可调度候选、关键 blockers 和 owner attention projection。不要把全部 backlog 或 review 内容复制成第二份 board。
+`tasks/*.md` 是 open backlog 的 canonical board；它们可以持续积累 `unready`、`pre-ready` 和 `ready` Task。`state.md` frontmatter 保留执行控制；正文只保留聚合 counts、hot tasks、下一批候选、关键 blockers 和 owner attention。不要复制全部 backlog，也不要重建正文时丢失 Run 暂停意图。
 
 默认 `wip_limit` 是 `4`。WIP 按当前 lifecycle 推导：
 
@@ -140,6 +140,8 @@ wip_count = count(task.lifecycle in {scheduled, in_progress, reported})
 `capture` 不会自动填充 WIP。WIP 4 只约束 owner 明确排期、`steady` 或 `accelerate` 下的调度；调度前重新计算当前 WIP，达到上限时保留 Task 在 backlog，并说明占用容量的 hot tasks。用户或项目可以声明其它有效 WIP，但 Lead 必须把 effective limit 和作用范围记录在 `state.md`。
 
 ## Execution modes
+
+持续执行先通过 [run-control.md](run-control.md) 的 Run gate；draining/paused 禁止新派发，也禁止自动重试。Mode 决定允许执行时怎么调度，不决定这一轮是否仍有预算或是否已经停机。
 
 Workstream 维护一个当前 execution mode，默认值是 `capture`：
 
@@ -205,7 +207,7 @@ runnable(task) =
 
 ## Lead closeout view
 
-每轮 Lead work cycle 完成后，从当前 projection、Task 和 review records 派生一次 closeout，不创建“session status”或额外 Task：
+有实质变化、需要 owner 决策或用户查询时才生成 closeout，不创建“session status”或额外 Task。普通推进只报告变化；里程碑或用户完整查询时展示以下六段。无变化、尤其预算暂停后的自动唤醒，不重复输出：
 
 1. `mode / WIP`：当前 mode、limit、counted lifecycle 与占用容量的 Task；
 2. `backlog counts`：按 readiness 的 backlog 总数与 active blocker 数；

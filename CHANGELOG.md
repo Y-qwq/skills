@@ -2,6 +2,20 @@
 
 本文档记录 skill 集合中对使用者可见的变化。具体实施历史仍以 Git commit 和 Pull Request 为准。
 
+## [0.3.1] - 2026-09-07
+
+### Workstream
+
+- 区分长期 Workstream 与有界 Run；新增准入、draining、暂停证明与恢复条件，预算停止不再借用 capture。
+- 无人值守执行先核验宿主停机能力；无法保证账户额度保留时不承诺硬保证，不用假报完成或 blocked 停机。
+- 自动唤醒不等于新授权；无变化不重复规划、查额度或输出六段看板，停机交接只通知一次。
+- 补充不调用模型的多轮轨迹检查；它验证停止契约，不冒充真实宿主已经停机的证明。
+- schema v2 保持兼容，只补充 state.run；旧额度停止记录保持关闭准入，升级本身不恢复业务执行。长期 Lead 应重新加载 skill 后先核验 Run gate，具体规则见 `run-control.md`。
+
+### Plugin release
+
+- 调整插件发布元数据版本为 `0.3.1`（仅 patch bump），包括 `.claude-plugin/plugin.json` 与 `.codex-plugin/plugin.json`。
+
 ## [0.3.0] - 2026-09-04
 
 ### Workstream

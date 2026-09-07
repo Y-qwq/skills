@@ -6,13 +6,21 @@ execution_mode: capture
 wip_limit: 4
 pre_ready_policy: explicit_only
 default_verification_depth: targeted
+run:
+  status: idle
+  stop_reason: null
+  resume_condition: owner-request
+  stop_verification: null
+  no_progress_cycles: 0
+  last_notice: null
+  budget: null
 ---
 
 # Current status
 
 {{current_status}}
 
-Frontmatter 是 execution mode、WIP limit、pre-ready policy 和 default verification depth 的唯一 control source。正文其余 current status、counts、hot tasks、references、blockers 与 owner attention 从 `tasks/`、`receipts/`、`reviews/` 和 live authority 重建；它不是第二份 canonical board，也不持久化某个 Lead work cycle 的 session status。
+Frontmatter 是执行控制的唯一来源，包括 Run gate；重建正文时不能覆盖它。正文由 Task、receipt、review 和 live authority 派生。Run 控制不是 session status；语义与恢复规则见 `references/run-control.md`。
 
 # Scheduling projection
 
@@ -69,7 +77,7 @@ Review records are an attention queue, not an approval gate. Build this section 
 
 # Lead closeout view
 
-After each Lead work cycle, derive a user-facing closeout from this projection and the current receipts/reviews. It must show mode/WIP, backlog counts, hot tasks, this-turn changes, active blockers, and owner attention. This view is not persisted as a lifecycle or session record.
+仅在有实质变化、需要决定或用户查询时输出；日常只报增量，里程碑/完整查询展示 mode/WIP、backlog、hot tasks、变化、blockers 和 owner attention。暂停提示按 run.last_notice 去重；无变化不生成重复看板。
 
 # Next actions
 

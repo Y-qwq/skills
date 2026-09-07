@@ -1,0 +1,11 @@
+{
+  "initial": { "status": "idle", "driver_active": false },
+  "policy": { "reserve_percent": 3, "drain_margin_percent": 1, "hard_reserve": true },
+  "capabilities": { "stop_available": false, "reserve_enforced": false },
+  "events": [
+    { "type": "start", "authorized": true, "remaining_percent": 50, "quota_fresh": true },
+    { "type": "tick" },
+    { "type": "tick" },
+    { "type": "status" }
+  ]
+}
