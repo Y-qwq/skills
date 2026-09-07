@@ -12,6 +12,10 @@
 - 补充不调用模型的多轮轨迹检查；它验证停止契约，不冒充真实宿主已经停机的证明。
 - schema v2 保持兼容，只补充 state.run；旧额度停止记录保持关闭准入，升级本身不恢复业务执行。长期 Lead 应重新加载 skill 后先核验 Run gate，具体规则见 `run-control.md`。
 
+### Plugin release
+
+- 调整插件发布元数据版本为 `0.3.1`（仅 patch bump），包括 `.claude-plugin/plugin.json` 与 `.codex-plugin/plugin.json`。
+
 ## [0.3.0] - 2026-09-04
 
 ### Workstream
