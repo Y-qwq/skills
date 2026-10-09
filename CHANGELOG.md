@@ -2,6 +2,14 @@
 
 本文档记录 skill 集合中对使用者可见的变化。具体实施历史仍以 Git commit 和 Pull Request 为准。
 
+## [0.3.2] - 2026-10-10
+
+### Removed
+
+- 移除 `workstream` skill 及其模板、参考文档、专属评测和校验脚本；集合保留两项前端 skills。
+- 更新安装目录说明与测试入口，两份插件 manifest 版本同步为 `0.3.2`。
+- 卸载 skill 不删除已有 workstream context 或任务记录。下方历史版本的升级说明不适用于当前版本。
+
 ## [0.3.1] - 2026-09-07
 
 ### Workstream
