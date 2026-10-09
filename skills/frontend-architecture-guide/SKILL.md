@@ -1,77 +1,52 @@
 ---
 name: frontend-architecture-guide
 description: >
-  Use whenever designing, refactoring, or reviewing React frontend structure, including component and
-  custom Hook boundaries, state ownership or Provider scope, abstractions, feature/module organization,
-  layered architecture, or where state, logic, and files should live. Apply proactively during broader
-  React reviews when these structural concerns are present, even if the user did not explicitly ask an
-  architecture question. Not for Effect dependencies, cleanup, refs, memoization, stale closures, or
-  other React runtime semantics; use react-best-practices.
+  Design and review React component/Hook boundaries, state ownership and Provider scope,
+  public contracts, abstractions, and cross-module dependencies. Use when deciding whether
+  to split, combine, share, or relocate responsibilities. Not for ordinary styling or local
+  display edits, or React runtime issues such as Effect dependencies and stale closures.
 ---
 
 # Frontend Architecture Guide
 
-一套主动审查 React 结构的决策框架。目标是让 ownership、公开 contract 和依赖方向清晰，而不是套用固定目录模板。只要设计、重构或 review 涉及 component、custom Hook、state、Provider、abstraction、feature/module 或文件归属，就应主动使用本 skill，即使用户没有直接提出架构问题。
+帮助判断职责如何拆分、组合与归属。文件命名、目录和技术选型遵循项目 AGENTS 与现有规范；只有实际责任边界需要时才增加结构。
 
-## 职责边界
+围绕本次任务涉及的边界及其直接调用方判断，不自动扩大为整个 feature 的重构。Effect、cleanup、ref、memoization 等运行时问题由 `react-best-practices` 处理；同时存在独立的结构与运行时问题时才共用两个 skill。
 
-本 skill 负责结构判断：
+## 为什么要拆
 
-- component 与 custom Hook 的职责、公开 API 和拆分边界
-- controlled / uncontrolled contract、composition、compound component 与 prop drilling
-- state/action ownership、提升时机与 Provider scope
-- abstraction、feature/module、layer 和文件归属
+从独立变化的需求和业务不变量判断边界：哪些职责会相互干扰，哪些决策必须一起变化？同一业务规则散落在多个调用方时，应集中到明确 owner；外观相似但业务意图不同的代码可以保留重复。
 
-Effect dependency、cleanup、stale closure、ref、memoization、Strict Mode、renderer integration 等 React 运行时语义由 `react-best-practices` 负责。只有 Hook 内确实存在 Effect、cleanup、closure、ref、render/commit 等运行时问题时才搭配该 skill；仅仅涉及 component 或 custom Hook 文件不构成共触发理由。
+文件长度、分支数量和重复次数只提供线索。大块 render branch 只有在体现不同职责、生命周期或使用方 contract 时才值得拆分。按独立流程或稳定职责判断，不把整个 feature 的复杂度归给每个单元。
 
-## 核心判断原则
+## 谁拥有它
 
-### 责任边界来自 change axis 与业务不变量
+State 与 action 属于能够维护不变量的最小稳定 owner。一起检查来源、允许的写入方、冲突处理、所需生命周期、重置与恢复方式，以及哪些 consumer 必须共享同一次状态转换。
 
-如果两个彼此独立的需求会反复修改同一个 unit，或同一业务不变量散落在多个 owner 中，应重新划分边界。不要因为文件变长、代码看起来相似或预想将来可能复用就拆分。
+区分远端事实、用户草稿与临时 UI state；派生值优先从其来源计算。跨页面或跨 feature 使用不自动需要全局 store；可从 server cache 或 URL 恢复的数据，不应仅为延长内存生命周期而再复制一份。Controlled/uncontrolled API 和 Provider 位置由这些约束决定。
 
-使用方应能通过 props、返回值和导出的类型理解 contract，而不必阅读实现才能安全使用。抽象应让调用处更清晰，并让应该一起变化的业务决策只存在于一处；外观相似但业务意图不同的代码可以保持重复。
+## 边界是否清楚
 
-### Render branch 是 component identity 的信号，不是自动拆分规则
+调用方应能从输入、结果、动作及失败语义理解 contract。Owner 对外暴露维护其不变量的能力，避免让每个调用方依靠通用 setter 或 raw dispatch 重新实现同一业务决策。
 
-单个 prop 改变大块 render branch 时，检查它是否代表独立 change axis、不同业务不变量或不同使用方 contract。只有这些差异形成稳定边界时才拆 component；局部、同一职责内的显示分支可以保留。
+拆分应减少需要同时理解的上下文，并支持职责独立变化。多个数据源需要共同维护一致性或恢复语义时，由明确的流程 owner 协调；独立展示的数据可以保留各自的加载、错误与刷新边界。
 
-Controlled / uncontrolled 不是优先级关系。根据 source of truth、允许的写入方、重置方式和使用方 contract 选择 API，并避免在同一个模糊接口中同时维护两套互相竞争的状态来源。
+## 依赖是否合理
 
-### Composition 应表达稳定结构
+UI 可以消费业务 contract；独立业务规则应能脱离具体 UI 使用。纯展示组件接收明确的数据和动作，Screen 或流程容器可以直接承担清楚、聚焦的编排。只有提取后形成真实责任边界时才增加 Hook、controller 或 adapter。
 
-优先用 composition 表达不同 component family 和布局关系，而不是不断增加 boolean prop 或 optional prop。Boolean prop 导致完全不同的 identity、生命周期或 contract 时，考虑拆成命名清晰的 component；否则保留简单 prop。
+检查实际依赖和决策归属，不根据目录名称推断分层。查询、外部服务和持久化沿用项目已有边界；不要求为了抽象完整而增加 domain/application/presentation/infrastructure 层。
 
-当一组可复用 UI 需要共享 scoped state/action 时，可使用 compound component 与可见的 Provider boundary。不要为避免少量 props 传递就引入隐式依赖；prop drilling 只有在中间层不拥有也不使用数据、并持续妨碍边界理解时才是重构信号。
+## 抽象是否值得
 
-除非 config 本身就是需要存储、传输或由业务编辑的 domain 数据，否则直接组合 JSX，避免把 config array 扩展成带 renderer、callback 协议和隐式控制流的 mini-framework。
+抽象应集中需要一起变化的决策，并简化调用处。若只是搬移代码、增加透传、让依赖变隐式，或为未知消费者引入配置与 callback 协议，优先保持直接表达。Composition 与共享 Provider 也按这个标准选择。
 
-### State 跟随 source of truth 与生命周期
+已有抽象失去独立职责时，可以合并或删除。短 façade 若拥有默认策略、适配或稳定公开接口，仍可能有价值；不按行数判断。Config 本身是需要存储、传输或编辑的业务数据时可以保留，普通 UI 组合无需发展成配置框架。
 
-State 应归属于能够维护其不变量、处理写入并恢复它的最小稳定 owner。判断时同时检查：
+## 判断示例
 
-- source of truth 在哪里
-- 谁可以写入，冲突如何解决
-- state 需要存活多久，卸载后如何恢复
-- 哪些 consumer 必须共享同一次状态转换
+- 页面并列展示两个独立 Query：可由页面直接组合；共享版本一致性、确认与恢复的两个结果，则需要共同流程 owner。Query 数量本身不决定结构。
+- 两个页面共享购物车草稿：按购物流程的生命周期选择稳定 owner；跨页面不意味着应用级全局状态。
+- 一个短组件绑定项目上传策略：有实际 contract 就可保留；只改名转发且没有独立责任的包装可以收回。
 
-跨 feature 使用只是重新检查 ownership 的信号，不会自动升级为 global state。根据 contract 在 URL、server cache、明确的 feature owner、scoped Provider 与 global store 之间选择。只有真正具备应用级身份和生命周期的数据才进入 global state。
-
-### 依赖方向应体现 ownership
-
-UI 可以依赖业务 contract；业务规则不应反向依赖具体 UI。Presentation 不直接拥有 API 编排或业务决策。是否需要 domain/application/presentation 等物理分层取决于真实复杂度，不应为了“架构完整”预先创建空目录或 pass-through layer。
-
-## 层级与结构升级
-
-只有任务需要选择或比较 Pure display、Small business component、Medium module、Complex page 等 module 层级，判断是否应建立或移除 domain/application/presentation 等 layer boundary，或者评估一次结构升级或降级时，才读取 [references/architecture-levels.md](references/architecture-levels.md)。State ownership、Provider scope、component/Hook API、feature/file 归属、composition 或 abstraction 判断本身都不是读取理由；即使同时存在 React 运行时问题，只要不需要做上述层级决策，也不要读取该 reference。
-
-## Review Checklist
-
-- 每个 state、action、业务不变量和生命周期职责是否有明确 owner？
-- Component 或 Hook 的公开 contract 是否足以让使用方理解用法？
-- 拆分是否对应独立 change axis，而不是机械响应文件长度或单个 render branch？
-- Composition、Context 或 Provider 是否让依赖更清晰，而不是隐藏数据流？
-- 跨 feature 数据是否按 source of truth、写入方、生命周期和恢复方式选择归属？
-- 抽象是否集中业务决策并简化调用处，还是形成 config-driven mini-framework？
-- 依赖是否指向 owner，层级是否与当前复杂度相称？
-- 若同时加载 `react-best-practices`，是否确实存在独立的 React 运行时问题？
+给出建议时说明当前边界的问题和调整后的收益。当前结构已足够清楚时，保留现状也是完整结论。

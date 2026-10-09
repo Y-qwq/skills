@@ -9,7 +9,6 @@
     "frontend-architecture-guide"
   ],
   "reference_policy": {
-    "architecture_levels": "must-read",
     "react_patterns": "must-not-read"
   },
   "must_identify": [
@@ -20,7 +19,7 @@
   "acceptable": [
     "Reject or collapse the proposed layers and colocate the simple flow.",
     "Keep only an extraction that has a current, named responsibility and independently improves the contract.",
-    "Describe the evidence that would justify rerunning the level decision later."
+    "Describe the concrete responsibility or contract change that would justify a new boundary later."
   ],
   "must_not": [
     "Approve the refactor because domain/application/presentation names look architecturally clean.",

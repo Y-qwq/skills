@@ -9,7 +9,6 @@
     "frontend-architecture-guide"
   ],
   "reference_policy": {
-    "architecture_levels": "must-not-read",
     "react_patterns": "must-not-read"
   },
   "must_identify": [
@@ -27,6 +26,6 @@
     "Load react-best-practices solely because the target is a custom Hook or uses useReducer.",
     "Recommend useCallback, useMemo, Effect dependencies, cleanup, refs, or stale-closure fixes without evidence.",
     "Expose only generic setters or raw dispatch while leaving invariants in each component.",
-    "Read the architecture-levels reference for an ordinary Hook and component boundary review."
+    "Require domain/application directories for a focused editor owner without showing a clearer responsibility boundary."
   ]
 }
