@@ -25,13 +25,9 @@ The repository root is both the marketplace root and the single plugin root. Eve
 └── skills/
     ├── frontend-architecture-guide/
     │   └── SKILL.md
-    ├── react-best-practices/
-    │   ├── SKILL.md
-    │   └── react-patterns.md
-    └── workstream/
+    └── react-best-practices/
         ├── SKILL.md
-        ├── assets/context/
-        └── references/
+        └── react-patterns.md
 ```
 
 ## Included skills
@@ -40,7 +36,6 @@ The repository root is both the marketplace root and the single plugin root. Eve
 | --- | --- |
 | `frontend-architecture-guide` | Decide when to split, combine, share, or relocate responsibilities using ownership and contract boundaries |
 | `react-best-practices` | Implement and review Effects, refs, memoization, custom Hooks, and component data flow |
-| `workstream` | Lead persistent, coordinated work across tasks, specialties, or repositories |
 
 ## Install
 
