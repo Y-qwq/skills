@@ -163,14 +163,8 @@ for (const entry of manifest.cases ?? []) {
     || contract.evaluation_tracks.some((track) => !evaluationTracks.has(track))) {
     fail(`${label}: evaluation_tracks do not match family`);
   }
-  for (const key of ["architecture_levels", "react_patterns"]) {
-    if (!referencePolicies.has(contract.reference_policy?.[key])) fail(`${label}: invalid ${key} policy`);
-  }
-  const expectsArchitecture = expectedSkills.includes("frontend-architecture-guide");
+  if (!referencePolicies.has(contract.reference_policy?.react_patterns)) fail(`${label}: invalid react_patterns policy`);
   const expectsReact = expectedSkills.includes("react-best-practices");
-  if (!expectsArchitecture && contract.reference_policy?.architecture_levels !== "must-not-read") {
-    fail(`${label}: architecture_levels must be must-not-read without the Architecture skill`);
-  }
   if (!expectsReact && contract.reference_policy?.react_patterns !== "must-not-read") {
     fail(`${label}: react_patterns must be must-not-read without the React skill`);
   }

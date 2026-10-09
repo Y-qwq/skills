@@ -38,7 +38,7 @@ The repository root is both the marketplace root and the single plugin root. Eve
 
 | Skill | Purpose |
 | --- | --- |
-| `frontend-architecture-guide` | Make component, state, abstraction boundary, and module organization decisions |
+| `frontend-architecture-guide` | Decide when to split, combine, share, or relocate responsibilities using ownership and contract boundaries |
 | `react-best-practices` | Implement and review Effects, refs, memoization, custom Hooks, and component data flow |
 | `workstream` | Lead persistent, coordinated work across tasks, specialties, or repositories |
 

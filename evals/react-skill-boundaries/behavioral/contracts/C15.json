@@ -11,7 +11,6 @@
     "react-best-practices"
   ],
   "reference_policy": {
-    "architecture_levels": "must-not-read",
     "react_patterns": "must-read"
   },
   "must_identify": [
@@ -29,6 +28,6 @@
     "Do not keep an empty dependency list, suppress exhaustive-deps, or hide businessId behind useMount/useEffectOnce.",
     "Do not use a ref guard to mask Strict Mode behavior.",
     "Do not create a global notification store or Provider when the stated feature owner and single consumer do not require one.",
-    "Do not read architecture-levels for this straightforward ownership/file-location decision."
+    "Do not introduce domain/application layers solely to relocate the Hook to its feature owner."
   ]
 }

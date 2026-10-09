@@ -11,7 +11,6 @@
     "react-best-practices"
   ],
   "reference_policy": {
-    "architecture_levels": "must-not-read",
     "react_patterns": "must-read"
   },
   "must_identify": [
@@ -29,6 +28,6 @@
     "Do not promote the cart to a global store or persistent storage; that contradicts the stated route-scoped lifecycle.",
     "Do not fix only Provider placement while leaving the confirmed Context identity churn, or fix only identity while leaving the wrong lifecycle owner.",
     "Do not use memo on consumers as the cure for Context propagation.",
-    "Do not read the architecture-levels reference: this is a Provider scope decision, not module layering or a structure-level upgrade."
+    "Do not add module layers solely to move the existing Provider to its correct lifecycle owner."
   ]
 }

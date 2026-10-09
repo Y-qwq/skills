@@ -9,7 +9,6 @@
     "frontend-architecture-guide"
   ],
   "reference_policy": {
-    "architecture_levels": "must-not-read",
     "react_patterns": "must-not-read"
   },
   "must_identify": [

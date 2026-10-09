@@ -2,6 +2,17 @@
 
 本文档记录 skill 集合中对使用者可见的变化。具体实施历史仍以 Git commit 和 Pull Request 为准。
 
+## [0.4.0] - 2026-10-10
+
+### Frontend Architecture
+
+- 围绕拆分依据、state/action owner、公开 contract、依赖和抽象收益做结构判断；文件命名与目录规范由项目决定。
+- 移除四级复杂度决策树与 `architecture-levels.md`，允许简单 Screen 直接组织聚焦流程，也允许合并失去独立职责的抽象。
+- 普通样式和局部展示修改不触发架构评审；保留与 React 运行时 skill 的职责分界。
+- 同步调整评估 contract，继续检查独立 Query、共同一致性 owner 和无效分层等行为，不再要求读取已删除的层级参考。
+
+升级副本时移除旧的 `references/architecture-levels.md`；现有项目目录无需随 skill 升级迁移。
+
 ## [0.3.1] - 2026-09-07
 
 ### Workstream
